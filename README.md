@@ -65,13 +65,15 @@ cb get-example simple
 > - `mkdocs.yml`: the mkdocs configuration file used by mkdocs to build the documentation website from the generated markdown files.
 
 
-### Generate your first documentation in markdown 👨‍💻
+### Build and show the documentation website locally! ⚡
 
 ``` sh
-cb generate-markdown simple
+cb serve simple
 ```
 
-> For each asset of `assets.jsonl`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/simple/generated_markdown` at `documentation_path`.
+You can now see the generated documentation at http://localhost:8000.
 
+> - For each asset of `assets.jsonl`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/simple/generated_markdown` at `documentation_path`.
+> - Mkdocs will then build the documentation website from the markdown files and using `mkdocs.yml` configuration file and serve it at http://localhost:8000.
 
 
