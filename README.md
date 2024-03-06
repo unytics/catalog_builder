@@ -23,7 +23,7 @@ There are **many open-source projects** (*admundsen, open-metadata, datahub, met
 
 **dbt docs** is great to generate a documentation website on top of your dbt assets but:
 
-- it focuses on dbt only (while you are interested in using other sources and metadata)
+- it focuses on dbt only (while you are interested in other sources + metadata)
 - is very hard to customize (except you're an angular expert)
 - can be slow.
 
