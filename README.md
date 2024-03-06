@@ -27,6 +27,8 @@
 > - is very hard to customize (except you're an angular expert)
 > - can be slow.
 
+<br>
+
 👉 CatalogBuilder aims at offering a **lightweight alternative** to generate a documentation website on top of your data assets. It focuses on **read-only data discovery** and:
 
 - ✔️ can be easily customized and deployed by low tech people
