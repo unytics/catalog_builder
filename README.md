@@ -27,7 +27,7 @@ There are **many open-source projects** (*admundsen, open-metadata, datahub, met
 - is very hard to customize (except you're an angular expert)
 - can be slow.
 
-CatalogBuilder aims at offering a **lightweight alternative** to generate a documentation website on top of your data assets. It focuses on **read-only data discovery** and:
+👉 CatalogBuilder aims at offering a **lightweight alternative** to generate a documentation website on top of your data assets. It focuses on **read-only data discovery** and:
 
 - ✔️ can be easily customized and deployed by low tech people
 - ✔️ can then handle the very specific needs of your company
