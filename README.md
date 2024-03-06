@@ -10,14 +10,14 @@
 
 <br>
 
-## 🔍️ What is CatalogBuilder?
+## 🔍️ 1. What is CatalogBuilder?
 
 - CatalogBuilder is a simple tool to **generate & deploy a documentation website** on top of your **data assets**.
 - It enables anyone at your company to **quickly find the trusted data they are looking for**. 
 
 <br>
 
-## 💡  Why CatalogBuilder?
+## 💡  2. Why CatalogBuilder?
 
 > There are **many open-source projects** (*admundsen, open-metadata, datahub, metacat, atlas*) to build such a catalog in-house. But as they offer a lot of advanced features, they are **hard to manage and deploy** if you're not a tech expert. They can be even **harder to customize**. 
 > 
@@ -39,7 +39,7 @@
 
 <br>
 
-## 💥 Getting Started with `cb` CLI
+## 💥 3. Getting Started with `cb` CLI
 
 > `cb` is the CLI (command-line-interface) of CatalogBuilder to generate, show & deploy the documentation.
 
@@ -93,3 +93,13 @@ cb gh-deploy simple
 
 You can follow [these instructions](https://www.mkdocs.org/user-guide/deploying-your-docs/#other-providers) from mkdocs.
 
+
+## 💎 4. Generate dbt documentation
+
+1. Change directory to your dbt project directory
+2. Run `dbt docs generate` to compute `target/manifest.json` and `target/catalog.json`.
+3. Download `catalogs/dbt` documentation example by running `cb get-example dbt`.
+    - 🔴 The main differences compared to above in that you won't find an `assets.jsonl` file but a `get_assets.py` file.
+    - `get_asset.py` will be used to generate the `assets.jsonl` file using the `target/manifest.json` and `target/catalog.json`.
+4. Run `cb get-assets dbt` to generate `assets.jsonl` using `get_asset.py`.
+5. As above, run `cb serve simple` to build the website and show it locally.
