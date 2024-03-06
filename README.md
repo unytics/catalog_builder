@@ -93,6 +93,8 @@ cb gh-deploy simple
 
 You can follow [these instructions](https://www.mkdocs.org/user-guide/deploying-your-docs/#other-providers) from mkdocs.
 
+<br>
+
 
 ## 💎 4. Generate dbt documentation
 
