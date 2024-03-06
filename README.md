@@ -43,13 +43,13 @@
 
 > `catb` is the CLI (command-line-interface) of CatalogBuilder to generate, show & deploy the documentation.
 
-### Install `catb` 🛠️
+### 3.1 Install `catb` 🛠️
 
 ``` sh
 pip install catalog-builder
 ```
 
-### Create your first documentation configuration 👨‍💻
+### 3.2 Create your first documentation configuration 👨‍💻
 
 ``` sh
 catb get-example simple
@@ -65,7 +65,7 @@ catb get-example simple
 > - `mkdocs.yml`: mkdocs configuration file used by mkdocs to build the documentation website from the generated markdown files.
 
 
-### Build and Show the documentation website locally! ⚡
+### 3.3 Build and Show the documentation website locally! ⚡
 
 ``` sh
 catb serve simple
@@ -77,7 +77,7 @@ You can now see the generated documentation at http://localhost:8000.
 > - Mkdocs will then build the documentation website from the markdown files into `catalogs/simple/site` (*using `mkdocs.yml` configuration file*) and serve it at http://localhost:8000.
 
 
-### Deploy the documentation website! 🚀
+### 3.4 Deploy the documentation website! 🚀
 
 **A. To deploy on GitHub pages**:
 
