@@ -1,4 +1,6 @@
-![logo](https://github.com/unytics/catalog_builder/assets/111615732/3fdba8ee-2b81-481d-85a8-ff66503b2239)
+![logo](https://github.com/unytics/catalog_builder/assets/111615732/bdb75e70-c7cd-4c7b-aa28-f015011f1edb)
+
+
 
 <p align="center">
     <em>Build a custom data-catalog in minutes</em>
@@ -8,7 +10,7 @@
 
 ## 🔍️ What is CatalogBuilder?
 
-CatalogBuilder is a simple tool to generate & deploy a documentation website on top of your data assets. It enables anyone at your company to quickly find the trusted data they are looking for. 
+`CatalogBuilder` is a simple tool to generate & deploy a documentation website on top of your data assets. It enables anyone at your company to quickly find the trusted data they are looking for. 
 
 <br>
 
