@@ -31,10 +31,10 @@
 
 👉 CatalogBuilder aims at offering a **lightweight alternative** to generate a documentation website on top of your data assets. It focuses on **read-only data discovery** and:
 
-- ✔️ can be easily customized and deployed by low tech people
-- ✔️ can then handle the very specific needs of your company
-- ✔️ is fast and lightweight
-- ✔️ is built on top of the very famous [mkdocs-material](https://github.com/squidfunk/mkdocs-material) python library which is used by millions of developers to deploy their documentation (*such as [fastapi](https://fastapi.tiangolo.com/)*).
+1. ✔️ can be easily customized and deployed by low tech people
+2. ✔️ can then handle the very specific needs of your company
+3. ✔️ is fast and lightweight
+4. ✔️ is built on top of the very famous [mkdocs-material](https://github.com/squidfunk/mkdocs-material) python library which is used by millions of developers to deploy their documentation (*such as [fastapi](https://fastapi.tiangolo.com/)*).
 
 
 <br>
