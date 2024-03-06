@@ -41,7 +41,7 @@
 
 ## 💥 Getting Started with `cb` CLI
 
-`cb` is the CLI (command-line-interface) of CatalogBuilder to generate, show & deploy the documentation.
+> `cb` is the CLI (command-line-interface) of CatalogBuilder to generate, show & deploy the documentation.
 
 ### Install `cb` 🛠️
 
