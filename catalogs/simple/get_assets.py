@@ -17,14 +17,14 @@ tables as (
   select 
     dataset_id || '.' || table_id as table,
     *,
-  from bigquery-public-data.america_health_rankings.__TABLES__
+  from {project}.{dataset}.__TABLES__
 ),
 
 table_descriptions as (
   select
     table_schema || '.' || table_name as table,
     regexp_extract(option_value, '^"(.*)"$') as description,
-  from bigquery-public-data.america_health_rankings.INFORMATION_SCHEMA.TABLE_OPTIONS
+  from {project}.{dataset}.INFORMATION_SCHEMA.TABLE_OPTIONS
   where option_name = 'description'
 ),
 
@@ -34,7 +34,7 @@ columns as (
     table_schema || '.' || table_name as table,
     data_type,
     description,
-  from bigquery-public-data.america_health_rankings.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS
+  from {project}.{dataset}.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS
 ),
 
 columns_details as (
@@ -42,8 +42,8 @@ columns_details as (
     column_name as name,
     table_schema || '.' || table_name as table,
     ordinal_position,
-    is_partitioning_column,
-  from bigquery-public-data.america_health_rankings.INFORMATION_SCHEMA.COLUMNS
+    is_partitioning_column = 'YES' as is_partitioning_column,
+  from {project}.{dataset}.INFORMATION_SCHEMA.COLUMNS
 ),
 
 
@@ -57,10 +57,18 @@ columns_joined as (
   left join columns_details using(table, name)
 ),
 
+paritioning_columns as (
+  select 
+    table, 
+    name as partitioning_column,
+  from columns_joined
+  where is_partitioning_column
+),
+
 table_columns as (
   select 
     table, 
-    array_agg((select as struct columns_joined.* except(table)) order by ordinal_position) as columns
+    array_agg((select as struct columns_joined.* except(table, ordinal_position, is_partitioning_column)) order by ordinal_position) as columns
   from columns_joined
   group by table
 ),
@@ -71,6 +79,7 @@ tables_joined as (
   from tables
   left join table_descriptions using(table)
   left join table_columns using(table)
+  left join paritioning_columns using(table)
 )
 
 
@@ -92,6 +101,7 @@ select
     end as size,
     type,
     description,
+    partitioning_column,
     columns
   ) as data,
 from tables_joined
