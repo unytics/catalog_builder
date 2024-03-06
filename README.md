@@ -8,6 +8,8 @@
 
 ---
 
+<br>
+
 ## 🔍️ What is CatalogBuilder?
 
 - CatalogBuilder is a simple tool to **generate & deploy a documentation website** on top of your **data assets**.
