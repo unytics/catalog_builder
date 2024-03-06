@@ -100,6 +100,6 @@ You can follow [these instructions](https://www.mkdocs.org/user-guide/deploying-
 2. Run `dbt docs generate` to compute `target/manifest.json` and `target/catalog.json`.
 3. Download `catalogs/dbt` documentation example by running `cb get-example dbt`.
     - 🔴 The main differences compared to above in that you won't find an `assets.jsonl` file but a `get_assets.py` file.
-    - `get_asset.py` will be used to generate the `assets.jsonl` file using the `target/manifest.json` and `target/catalog.json`.
-4. Run `cb get-assets dbt` to generate `assets.jsonl` using `get_asset.py`.
+    - 🔴 `get_asset.py` will be used to generate the `assets.jsonl` file using the `target/manifest.json` and `target/catalog.json`.
+4. Run `cb get-assets dbt` to generate `assets.jsonl` using `get_assets.py`.
 5. As above, run `cb serve simple` to build the website and show it locally.
