@@ -61,7 +61,8 @@ cb get-example simple
 >   - `asset_type`: for example: `table`.
 >   - `documentation_path`: the path of the asset page in the generated documentation.
 >   - `data`: a json of the attributes of the asset needed to generate the documentation.
-> - `templates` folder which includes a jinja template markdown file for every `asset_type`. 
+> - `templates`: afolder which includes a jinja template markdown file for every `asset_type`. These templates are used to generate a markdown documentation file for each asset.
+> - `mkdocs.yml`: the mkdocs configuration file used by mkdocs to build the documentation website from the generated markdown files.
 
 
 ### Generate your first documentation in markdown 👨‍💻
@@ -70,7 +71,7 @@ cb get-example simple
 cb generate-markdown simple
 ```
 
-For each asset of `assets.jsonl`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/simple/generated_markdown` at `documentation_path`.
+> For each asset of `assets.jsonl`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/simple/generated_markdown` at `documentation_path`.
 
 
 
