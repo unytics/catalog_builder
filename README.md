@@ -65,7 +65,7 @@ cb get-example simple
 > - `mkdocs.yml`: mkdocs configuration file used by mkdocs to build the documentation website from the generated markdown files.
 
 
-### Build and show the documentation website locally! ⚡
+### Build and Show the documentation website locally! ⚡
 
 ``` sh
 cb serve simple
@@ -77,7 +77,7 @@ You can now see the generated documentation at http://localhost:8000.
 > - Mkdocs will then build the documentation website from the markdown files into `catalogs/simple/site` (*using `mkdocs.yml` configuration file*) and serve it at http://localhost:8000.
 
 
-### Build and deploy the documentation website! 🚀
+### Deploy the documentation website! 🚀
 
 **A. To deploy on GitHub pages**:
 
