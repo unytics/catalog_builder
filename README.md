@@ -53,14 +53,13 @@ pip install catalog-builder
 cb get-example simple
 ```
 
-This will download the `catalogs/simple_example` folder from `catalog_builder` repository. You will find the following files in the folder:
-
-- `assets.jsonl`: a [json lines file](https://medium.com/@sujathamudadla1213/difference-between-ordinary-json-and-json-lines-fc746f93d75e) which contains all the assets you want to put in your documentation. Each asset must have at least the following field:
-  - `asset_type`: for example: `table`.
-  - `documentation_path`: the path of the asset page in the generated documentation.
-  - `data`: a json of the attributes of the asset needed to generate the documentation.
-- `templates` folder which includes a jinja template markdown file for every `asset_type`. 
-- a 
+> This will download the `catalogs/simple_example` folder from `catalog_builder` repository. You will find the following files in the folder:
+> 
+> - `assets.jsonl`: a [json lines file](https://medium.com/@sujathamudadla1213/difference-between-ordinary-json-and-json-lines-fc746f93d75e) which contains all the assets you want to put in your documentation. Each asset must have at least the following field:
+>   - `asset_type`: for example: `table`.
+>   - `documentation_path`: the path of the asset page in the generated documentation.
+>   - `data`: a json of the attributes of the asset needed to generate the documentation.
+> - `templates` folder which includes a jinja template markdown file for every `asset_type`. 
 
 
 ### Generate your first documentation in markdown 👨‍💻
