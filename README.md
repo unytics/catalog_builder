@@ -74,6 +74,6 @@ cb serve simple
 You can now see the generated documentation at http://localhost:8000.
 
 > - For each asset of `assets.jsonl`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/simple/generated_markdown` at `documentation_path`.
-> - Mkdocs will then build the documentation website from the markdown files and using `mkdocs.yml` configuration file and serve it at http://localhost:8000.
+> - Mkdocs will then build the documentation website from the markdown files (*using `mkdocs.yml` configuration file*) and serve it at http://localhost:8000.
 
 
