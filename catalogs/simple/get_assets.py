@@ -106,6 +106,7 @@ select
     columns
   ) as data,
 from tables_joined
+where date(timestamp_millis(last_modified_time)) >= current_date - 31
 
 
 '''
@@ -113,8 +114,11 @@ from tables_joined
 
 bigquery = google.cloud.bigquery.Client()
 datasets = bigquery.list_datasets(PROJECT)
+datasets = [d.dataset_id for d in datasets]
 
 with open(f'{HERE}/tmp_assets.jsonl', 'w', encoding='utf-8') as out:
+    content = json.dumps({'asset_type': 'homepage', 'path': 'index.md', 'data': {'datasets': datasets}})
+    out.write(content + '\n')
     for dataset in datasets:
         dataset_id = dataset.dataset_id
         print(dataset_id)
@@ -129,6 +133,8 @@ with open(f'{HERE}/tmp_assets.jsonl', 'w', encoding='utf-8') as out:
             print(f'COULD NOT GET TABLES FOR DATASET {dataset_id}')
             continue
         tables = [dict(t) for t in tables]
+        if not tables:
+            continue
         dataset = {
             'asset_type': 'dataset', 
             'path': f'{dataset_id}/index',
