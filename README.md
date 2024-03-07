@@ -73,7 +73,7 @@ catalog serve simple
 
 You can now see the generated documentation at http://localhost:8000.
 
-> - For each asset of `assets.jsonl`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/simple/generated_markdown` at `documentation_path`.
+> - For each asset of `assets.jsonl`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/simple/docs/` at `documentation_path`.
 > - Mkdocs will then build the documentation website from the markdown files into `catalogs/simple/site` (*using `mkdocs.yml` configuration file*) and serve it at http://localhost:8000.
 
 
@@ -85,7 +85,7 @@ You can now see the generated documentation at http://localhost:8000.
 catalog gh-deploy simple
 ```
 
-> - For each asset of `assets.jsonl`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/simple/generated_markdown` at `documentation_path`.
+> - For each asset of `assets.jsonl`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/simple/docs/` at `documentation_path`.
 > - Mkdocs will then build the documentation website from the markdown files into `catalogs/simple/site` (*using `mkdocs.yml` configuration file*) and [deploy it on GitHub pages](https://www.mkdocs.org/user-guide/deploying-your-docs/) (this only works if you are on a github repository).
 
 

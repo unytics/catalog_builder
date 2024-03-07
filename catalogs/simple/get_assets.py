@@ -1,6 +1,7 @@
 import os
 import json 
 
+import pandas as pd
 import google.cloud.bigquery
 
 PROJECT = 'bigquery-public-data'
@@ -33,7 +34,7 @@ columns as (
     field_path as name,
     table_schema || '.' || table_name as table,
     data_type,
-    description,
+    ifnull(description, '') as description,
   from {project}.{dataset}.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS
 ),
 
@@ -100,8 +101,8 @@ select
       else format('%.2f MB', size_bytes / pow(2, 20))
     end as size,
     type,
-    description,
-    partitioning_column,
+    ifnull(description, '') as description,
+    ifnull(partitioning_column, '') as partitioning_column,
     columns
   ) as data,
 from tables_joined
@@ -113,7 +114,7 @@ from tables_joined
 bigquery = google.cloud.bigquery.Client()
 datasets = bigquery.list_datasets(PROJECT)
 
-with open(f'{HERE}/assets.jsonl', 'w', encoding='utf-8') as out:
+with open(f'{HERE}/tmp_assets.jsonl', 'w', encoding='utf-8') as out:
     for dataset in datasets:
         dataset_id = dataset.dataset_id
         print(dataset_id)
@@ -130,14 +131,20 @@ with open(f'{HERE}/assets.jsonl', 'w', encoding='utf-8') as out:
         tables = [dict(t) for t in tables]
         dataset = {
             'asset_type': 'dataset', 
-            'path': dataset_id,
+            'path': f'{dataset_id}/index',
             'data': {
                 'name': dataset_id, 
-                'description': dataset.description,
-                'tables': tables,
+                'description': dataset.description or '',
+                'tables': [
+                    {k: v for k, v in table['data'].items() if k != 'columns'}
+                    for table in tables
+                ],
             }
         }
         assets = [dataset] + tables
         content = '\n'.join([json.dumps(asset) for asset in assets])
         out.write(content + '\n')
 
+
+df = pd.read_json(f'{HERE}/tmp_assets.jsonl', lines=True)
+df.to_parquet(f'{HERE}/assets.parquet')
