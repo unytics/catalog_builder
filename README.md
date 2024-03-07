@@ -39,11 +39,11 @@
 
 <br>
 
-## 💥 3. Getting Started with `catb` CLI
+## 💥 3. Getting Started with `catalog` CLI
 
-> `catb` is the CLI (command-line-interface) of CatalogBuilder to generate, show & deploy the documentation.
+> `catalog` is the CLI (command-line-interface) of CatalogBuilder to generate, show & deploy the documentation.
 
-### 3.1 Install `catb` 🛠️
+### 3.1 Install `catalog` 🛠️
 
 ``` sh
 pip install catalog-builder
@@ -52,7 +52,7 @@ pip install catalog-builder
 ### 3.2 Create your first documentation configuration 👨‍💻
 
 ``` sh
-catb get-example simple
+catalog get-example simple
 ```
 
 > This will download the `catalogs/simple` example folder from this repository. You will find the following files in the folder:
@@ -68,7 +68,7 @@ catb get-example simple
 ### 3.3 Build and Show the documentation website locally! ⚡
 
 ``` sh
-catb serve simple
+catalog serve simple
 ```
 
 You can now see the generated documentation at http://localhost:8000.
@@ -82,7 +82,7 @@ You can now see the generated documentation at http://localhost:8000.
 **A. To deploy on GitHub pages**:
 
 ``` sh
-catb gh-deploy simple
+catalog gh-deploy simple
 ```
 
 > - For each asset of `assets.jsonl`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/simple/generated_markdown` at `documentation_path`.
@@ -100,8 +100,13 @@ You can follow [these instructions](https://www.mkdocs.org/user-guide/deploying-
 
 1. Change directory to your dbt project directory
 2. Run `dbt docs generate` to compute `target/manifest.json` and `target/catalog.json`.
-3. Download `catalogs/dbt` documentation example by running `catb get-example dbt`.
+3. Download `catalogs/dbt` documentation example by running `catalog get-example dbt`.
     - 🔴 The main differences compared to above in that you won't find an `assets.jsonl` file but a `get_assets.py` file.
     - 🔴 `get_asset.py` will be used to generate the `assets.jsonl` file using the `target/manifest.json` and `target/catalog.json`.
-4. Run `catb get-assets dbt` to generate `assets.jsonl` using `get_assets.py`.
-5. As above, run `catb serve simple` to build the website and show it locally.
+4. Run `catalog get-assets dbt` to generate `assets.jsonl` using `get_assets.py`.
+5. As above, run `catalog serve simple` to build the website and show it locally.
+
+
+## TODO
+
+- schema assets.jsonl contient name et description?
