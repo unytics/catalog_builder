@@ -8,5 +8,5 @@
 **Datasets**
 
 {% for dataset in datasets %}
-- [{{ dataset }}]({{ dataset }}.md)
+- [{{ dataset }}]({{ dataset }}/index.md)
 {% endfor %}
