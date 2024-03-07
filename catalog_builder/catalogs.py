@@ -57,7 +57,7 @@ class Catalog:
             os.makedirs(folder, exist_ok=True)
             with open(path, 'w', encoding='utf8') as out:
                 out.write(content)
-            if k > 1000:
-                break
+            # if k > 1000:
+            #     break
         if os.path.isfile(f'{self.folder}/style.css'):
             shutil.copyfile(f'{self.folder}/style.css', f'{self.folder}/docs/style.css')
