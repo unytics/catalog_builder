@@ -1,14 +1,10 @@
 import os
-import functools
-import traceback
-import sys
-import urllib.request
 
-import requests
 import click
 from click_help_colors import HelpColorsGroup
 
 from .catalogs import Catalog, CatalogException
+from .utils import handle_error, print_info, download_github_folder, exec
 
 
 @click.group(
@@ -20,58 +16,6 @@ def cli():
     pass
 
 
-def print_color(msg):
-    click.echo(click.style(msg, fg='cyan'))
-
-def print_success(msg):
-    click.echo(click.style(f'SUCCESS: {msg}', fg='green'))
-
-def print_info(msg):
-    click.echo(click.style(f'INFO: {msg}', fg='yellow'))
-
-def print_command(msg):
-    click.echo(click.style(f'INFO: `{msg}`', fg='magenta'))
-
-def print_warning(msg):
-    click.echo(click.style(f'WARNING: {msg}', fg='cyan'))
-
-
-def handle_error(f):
-
-    @functools.wraps(f)
-    def wrapper(*args, **kwargs):
-        try:
-            return f(*args, **kwargs)
-        except (AssertionError, CatalogException) as e:
-            click.echo(click.style(f'ERROR: {e}', fg='red'))
-            sys.exit()
-        except Exception as e:
-            click.echo(click.style(f'ERROR: {e}', fg='red'))
-            print(traceback.format_exc())
-            sys.exit()
-
-    return wrapper
-
-
-def download_github_folder(folder):
-    url = f'https://api.github.com/repos/unytics/catalog_builder/contents/{folder}'
-    resp = requests.get(url)
-    if not resp.ok:
-        raise CatalogException(f'Could not list files in {folder} catalog: {resp.text}')
-    files = resp.json()
-    for file in files:
-        if file['type'] == 'file':
-            try:
-                file_folder = '/'.join(file['path'].split('/')[:-1])
-                os.makedirs(file_folder, exist_ok=True)
-                urllib.request.urlretrieve(file['download_url'], file['path'])
-            except Exception as e:
-                raise CatalogException(f"Could not download file at url `{file['download_url']}`. Reason: {e}")
-        elif file['type'] == 'dir':
-            download_github_folder(file['path'])
-
-
-
 @cli.command()
 @click.argument('catalog_name')
 @handle_error
@@ -79,8 +23,38 @@ def download(catalog_name):
     '''
     Download CATALOG_NAME configuration folder from `catalog_builder` GitHub
     '''
-    # if os.path.isdir(f'catalogs/{catalog_name}'):
-    #     raise CatalogException(f'`catalogs/{catalog_name}` folder already exists. If you wish to download it again please remove the folder beforehand.')
+    if os.path.isdir(f'catalogs/{catalog_name}'):
+        raise CatalogException(f'`catalogs/{catalog_name}` folder already exists. If you wish to download it again please remove the folder beforehand.')
     download_github_folder(f'catalogs/{catalog_name}')
     print_success(f'Downloaded `catalogs/{catalog_name}`')
 
+
+@cli.command()
+@click.argument('catalog_name')
+@handle_error
+def build(catalog_name):
+    '''
+    Build CATALOG_NAME catalog (builds docs/ and site/)
+    '''
+    catalog = Catalog(catalog_name)
+    print_info(f'Generating mardown files into {catalog.folder}/docs')
+    catalog.generate_markdown()
+    config_file = f'catalogs/{catalog_name}/mkdocs.yml'
+    if not os.path.isfile(config_file):
+        raise CatalogException(f'Missing config file {config_file}')
+    print_info(f'Building site from mardown files into {catalog.folder}/site')
+    exec(f'mkdocs build --config-file {config_file}')
+
+
+@cli.command()
+@click.argument('catalog_name')
+@handle_error
+def serve(catalog_name):
+    '''
+    Serve CATALOG_NAME website on http://localhost:8000
+    '''
+    catalog = Catalog(catalog_name)
+    if not os.path.isdir(f'{catalog.folder}/site'):
+        raise CatalogException(f'`{catalog.folder}/site` folder does not exist. Please build it with `build` command')
+    print_info(f'Serving website. Open this url in your browser --> http://localhost:8000 !')
+    exec(f'python -m http.server --directory {catalog.folder}/site')
