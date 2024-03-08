@@ -129,6 +129,7 @@ To generate a documentation website for your own dbt project, do the following:
 ## 👋 Contribute
 
 Any contribution is more than welcome 🤗!
+
 - Add a ⭐ on the repo to show your support
 - [Join our Slack](https://join.slack.com/t/unytics/shared_invite/zt-1gbv491mu-cs03EJbQ1fsHdQMcFN7E1Q) and talk with us
 - Raise an issue to raise a bug or suggest improvements
@@ -136,7 +137,10 @@ Any contribution is more than welcome 🤗!
 
 
 <style>
-  .md-sidebar--primary {
-    display: none!important;
-  }
+.md-sidebar--primary {
+display: none!important;
+}
+:root {
+--md-primary-fg-color:        #2acfa7ff!important;
+}  
 </style>
