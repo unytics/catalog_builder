@@ -51,11 +51,12 @@ pip install catalog-builder
 
 ### 3.2 Create your first documentation configuration 👨‍💻
 
-To get started, let's download a catalog configuration example and play with it. The following command will download the [`catalogs/bigquery_public_data`](https://github.com/unytics/catalog_builder/tree/main/catalogs/bigquery_public_data) folder on your laptop.
-
 ``` sh
 catalog download bigquery_public_data
 ```
+
+To get started, let's download  a catalog configuration example from the GitHub repo and play with it. The above command will download the [`catalogs/bigquery_public_data`](https://github.com/unytics/catalog_builder/tree/main/catalogs/bigquery_public_data) folder on your laptop.
+
 
 > You will find in the folder:
 > 
