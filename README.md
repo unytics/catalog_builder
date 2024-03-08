@@ -77,8 +77,9 @@ catalog serve bigquery_public_data
 
 You can now see the generated documentation at http://localhost:8000.
 
-> - For each asset of the `assets file`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/bigquery_public_data/docs/` at `documentation_path`.
-> - Mkdocs will then build the documentation website from the markdown files into `catalogs/bigquery_public_data/site` (*using `mkdocs.yml` configuration file*) and serve it at http://localhost:8000.
+> 1. For each asset of the `assets file`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/bigquery_public_data/docs/` at `documentation_path`.
+> 2. Mkdocs will then build the documentation website from the markdown files into `catalogs/bigquery_public_data/site` (*using `mkdocs.yml` configuration file*).
+> 3. Mkdocs will serve the site at http://localhost:8000.
 
 
 ### 3.4 Deploy the documentation website! 🚀
@@ -89,8 +90,9 @@ You can now see the generated documentation at http://localhost:8000.
 catalog gh-deploy bigquery_public_data
 ```
 
-> - For each asset of the `assets file`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/bigquery_public_data/docs/` at `documentation_path`.
-> - Mkdocs will then build the documentation website from the markdown files into `catalogs/bigquery_public_data/site` (*using `mkdocs.yml` configuration file*) and [deploy it on GitHub pages](https://www.mkdocs.org/user-guide/deploying-your-docs/) (this only works if you are on a github repository).
+> 1. For each asset of the `assets file`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/bigquery_public_data/docs/` at `documentation_path`.
+> 2. Mkdocs will then build the documentation website from the markdown files into `catalogs/bigquery_public_data/site` (*using `mkdocs.yml` configuration file*).
+> 3. Mkdocs will [deploy the site on GitHub pages](https://www.mkdocs.org/user-guide/deploying-your-docs/) (this only works if you are on a github repository).
 
 
 **B. To deploy elsewhere**:
