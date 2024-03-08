@@ -57,7 +57,7 @@ catalog get-example simple
 
 > This will download the `catalogs/simple` example folder from this repository. You will find the following files in the folder:
 > 
-> - `assets.jsonl`: [json lines file](https://medium.com/@sujathamudadla1213/difference-between-ordinary-json-and-json-lines-fc746f93d75e) which contains all the assets you want to put in your documentation. Each asset must have at least the following field:
+> - `assets.jsonl`: [json lines file](https://medium.com/@sujathamudadla1213/difference-between-ordinary-json-and-json-lines-fc746f93d75e) which contains all the assets you want to put in your documentation. Each asset must have at least the following fields:
 >   - `asset_type`: for example: `table`.
 >   - `documentation_path`: the path of the asset page in the generated documentation.
 >   - `data`: a json of the attributes of the asset needed to generate the documentation.
