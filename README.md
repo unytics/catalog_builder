@@ -78,7 +78,7 @@ catalog serve bigquery_public_data
 You can now see the generated documentation at http://localhost:8000.
 
 > 1. For each asset of the `assets file`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/bigquery_public_data/docs/` at `documentation_path`.
-> 2. Mkdocs will then build the documentation website from the markdown files into `catalogs/bigquery_public_data/site` (*using `mkdocs.yml` configuration file*).
+> 2. Mkdocs will then build the documentation website from the markdown files into `catalogs/bigquery_public_data/site` (using `mkdocs.yml` configuration file).
 > 3. Mkdocs will serve the site at http://localhost:8000.
 
 
