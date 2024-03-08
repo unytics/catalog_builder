@@ -86,7 +86,7 @@ catalog build bigquery_public_data
 catalog serve bigquery_public_data
 ```
 
-You can now see the generated documentation website at http://localhost:8000.
+> You can now see the generated documentation website at http://localhost:8000.
 
 
 ### 3.5 Deploy the documentation website! 🚀
