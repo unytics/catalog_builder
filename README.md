@@ -61,8 +61,8 @@ catalog download bigquery_public_data
 > 
 > - `assets file`: a file containing the list of the assets you want to put in your documentation. It can be a parquet file named `assets.parquet` or a [json lines file](https://medium.com/@sujathamudadla1213/difference-between-ordinary-json-and-json-lines-fc746f93d75e) named  `assets.jsonl`. Each asset in the file must have the following fields:
 >   - `asset_type`: for example: `table`.
->   - `documentation_path`: the path of the asset page in the generated documentation.
->   - `data`: a json of the attributes of the asset needed to generate the documentation.
+>   - `documentation_path`: the path of the asset page in the generated documentation. For example `dataset_name/table_name`.
+>   - `data`: a dict of the attributes of the asset needed to generate the documentation. For example `{"name": "foo"}`
 > - `generate_assets_file.py`: the python script used to (re)generate the `assets file`.
 > - `requirements.txt`: the python requirements needed by `generate_assets_file.py`.
 > - `templates`: a folder which includes a jinja-template markdown-file for every `asset_type`. These templates are used to generate a markdown documentation file for each asset.
