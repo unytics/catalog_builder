@@ -110,6 +110,7 @@ You can follow [these instructions](https://www.mkdocs.org/user-guide/deploying-
 4. Generate the assets file by running `python catalogs/dbt/generate_assets_file.py`. The script will parse `target/manifest.json` and `target/catalog.json` to generate the `assets file` in the expected format.
 5. Run `catalog serve dbt` to build the website and show it locally.
 
+<br>
 
 
 ## Keep in touch 🧑‍💻
