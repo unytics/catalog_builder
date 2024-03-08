@@ -94,13 +94,22 @@ catalog serve bigquery_public_data
 **A. To deploy on GitHub pages**:
 
 ``` sh
-catalog gh-deploy bigquery_public_data
+catalog deploy github-pages bigquery_public_data
 ```
 
 > Mkdocs will [deploy the site on GitHub pages](https://www.mkdocs.org/user-guide/deploying-your-docs/) (this only works if you are on a github repository).
 
 
-**B. To deploy elsewhere**:
+**B. To deploy on Google Cloud Storage Bucket**:
+
+``` sh
+catalog deploy gcs bigquery_public_data
+```
+
+> Mkdocs will copy all the files in `catalogs/bigquery_public_data/site` to the bucket defined by `site_url` value of `catalogs/bigquery_public_data/mkdocs.yml`. For instance if the site url is `http://catalogs.unytics.io/bigquery_public_data/` it will copy all files under `catalogs/bigquery_public_data/site` to `gs://catalogs.unytics.io/bigquery_public_data/` 
+
+
+**C. To deploy elsewhere**:
 
 You can follow [these instructions](https://www.mkdocs.org/user-guide/deploying-your-docs/#other-providers) from mkdocs.
 
