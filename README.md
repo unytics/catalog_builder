@@ -102,7 +102,9 @@ You can follow [these instructions](https://www.mkdocs.org/user-guide/deploying-
 <br>
 
 
-## 💎 4. Generate dbt documentation
+## 💎 4. Generate your dbt documentation
+
+To generate a documentation website for your own dbt project, do the following:
 
 1. Change directory to your dbt project directory
 3. Download `catalogs/dbt` documentation example by running `catalog download dbt`.
