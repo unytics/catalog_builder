@@ -1,7 +1,10 @@
+import os
 import functools
 import traceback
 import sys
+import urllib.request
 
+import requests
 import click
 from click_help_colors import HelpColorsGroup
 
@@ -52,14 +55,34 @@ def handle_error(f):
 
 
 
+
 @cli.command()
-@click.argument('name')
+@click.argument('catalog_name')
 @handle_error
-def get_example(name):
+def download(catalog_name):
     '''
-    Create CONNECTION
+    Download CATALOG_NAME configuration folder from catalogs_builder GitHub
     '''
-    catalog = Catalog(name)
-    catalog.generate_markdown()
-    print_success(f'Created connection `{name}`')
+    if os.path.isdir(f'catalogs/{catalog_name}'):
+        raise CatalogException(f'`catalogs/{catalog_name}` folder already exists. If you wish to download it again please remove the folder beforehand.')
+
+    def download_github_folder(folder):
+        url = f'https://api.github.com/repos/unytics/catalog_builder/contents/{folder}'
+        resp = requests.get(url)
+        if not resp.ok:
+            raise CatalogException(f'Could not list files in {folder} catalog: {resp.text}')
+        files = resp.json()
+        for file in files:
+            if file['type'] == 'file':
+                try:
+                    file_folder = '/'.join(file['path'].split('/')[:-1])
+                    os.makedirs(file_folder, exist_ok=True)
+                    urllib.request.urlretrieve(file['download_url'], file['path'])
+                except Exception as e:
+                    raise CatalogException(f"Could not download file at url `{file['download_url']}`. Reason: {e}")
+            elif file['type'] == 'dir':
+                download_github_folder(file['path'])
+
+    download_github_folder(f'catalogs/{catalog_name}')
+    print_success(f'Downloaded `catalogs/{catalog_name}`')
 

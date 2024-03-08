@@ -30,6 +30,7 @@ setuptools.setup(
         'click-help-colors',
         'pyarrow',
         'pandas',
+        'requests',
     ],
     entry_points={
         'console_scripts': [
