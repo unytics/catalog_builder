@@ -82,8 +82,6 @@ catalog build bigquery_public_data
 
 ### 3.4 Run your catalog website locally ⚡
 
-Run: 
-
 ``` sh
 catalog serve bigquery_public_data
 ```
