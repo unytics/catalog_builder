@@ -9,6 +9,10 @@ import click
 import requests
 
 
+class CatalogException(Exception):
+    pass
+
+
 def print_color(msg):
     click.echo(click.style(msg, fg='cyan'))
 

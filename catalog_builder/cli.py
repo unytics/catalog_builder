@@ -4,8 +4,8 @@ import click
 from click_help_colors import HelpColorsGroup
 import yaml
 
-from .catalogs import Catalog, CatalogException
-from .utils import handle_error, print_info, download_github_folder, exec
+from .catalogs import Catalog
+from .utils import handle_error, print_info, download_github_folder, exec, CatalogException
 
 
 @click.group(
@@ -32,14 +32,17 @@ def download(catalog_name):
 
 @cli.command()
 @click.argument('catalog_name')
+@click.option('--markdown_only', is_flag=True)
 @handle_error
-def build(catalog_name):
+def build(catalog_name, markdown_only):
     '''
     Build CATALOG_NAME catalog (builds docs/ and site/)
     '''
     catalog = Catalog(catalog_name)
     print_info(f'Generating mardown files into {catalog.folder}/docs')
     catalog.generate_markdown()
+    if markdown_only:
+        return
     config_file = f'catalogs/{catalog_name}/mkdocs.yml'
     if not os.path.isfile(config_file):
         raise CatalogException(f'Missing config file {config_file}')
@@ -71,6 +74,7 @@ def deploy():
 
 @deploy.command()
 @click.argument('catalog_name')
+@handle_error
 def github_pages(catalog_name):
     '''
     Deploy documentation website on GitHub pages
@@ -83,21 +87,22 @@ def github_pages(catalog_name):
     exec(f'mkdocs gh-deploy --config-file {config_file} --force')
 
 
-# @deploy.command()
-# @click.argument('catalog_name')
-# def gcs(catalog_name):
-#     '''
-#     Deploy documentation website on a Google Cloud Storage bucket
-#     '''
-#     catalog = Catalog(catalog_name)
-#     config_file = f'catalogs/{catalog_name}/mkdocs.yml'
-#     if not os.path.isdir(f'{catalog.folder}/site'):
-#         raise CatalogException(f'`{catalog.folder}/site` folder does not exist. Please build it with `build` command')
-#     if not os.path.isfile(config_file):
-#         raise CatalogException(f'Missing config file {config_file}')
-#     config = yaml.safe_load(open(config_file, encoding='utf-8').read())
-#     breakpoint()
-#     print_info(f'Deploying site to GitHub pages')
-#     exec(f'mkdocs gh-deploy --config-file {config_file} --force')
-
-#     gcloud storage cp catalogs/simple/site/pypi/distribution_metadata/index.html  gs://catalogs.unytics.io/bigquery_public_data/pypi/distribution_metadata/index.html
+@deploy.command()
+@click.argument('catalog_name')
+@handle_error
+def gcs(catalog_name):
+    '''
+    Deploy documentation website on a Google Cloud Storage bucket
+    '''
+    catalog = Catalog(catalog_name)
+    config_file = f'catalogs/{catalog_name}/mkdocs.yml'
+    if not os.path.isdir(f'{catalog.folder}/site'):
+        raise CatalogException(f'`{catalog.folder}/site` folder does not exist. Please build it with `build` command')
+    if not os.path.isfile(config_file):
+        raise CatalogException(f'Missing config file {config_file}')
+    config = yaml.safe_load(open(config_file, encoding='utf-8').read())
+    site_url = config['site_url']
+    destination = site_url.split('://')[1]
+    destination = destination.rstrip('/')
+    print_info(f'Copying site to destination `{destination}`')
+    exec(f'gcloud storage cp -r {catalog.folder}/site gs://{destination}')

@@ -4,10 +4,11 @@ import os
 import jinja2
 import pandas as pd
 
+from .utils import CatalogException
+
+
 CATALOGS_CONF_FOLDER = 'catalogs'
 
-class CatalogException(Exception):
-    pass
 
 
 class Catalog:
