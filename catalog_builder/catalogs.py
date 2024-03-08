@@ -39,7 +39,7 @@ class Catalog:
         elif os.path.isfile(f'{self.folder} /assets.jsonl'):
             self._assets = pd.read_json(f'{self.folder}/assets.jsonl', lines=True)
         else:
-            raise CatalogException(f'Could not find any assets file. Neither `{self.folder}/assets.parquet` nor `{self.folder}/assets.jsonl` exist. Please generate them.')
+            raise CatalogException(f'Could not find any assets file. Neither `{self.folder}/assets.parquet` nor `{self.folder}/assets.jsonl` exist. Please generate the file by running `{self.folder}/generate_assets_file.py`.')
         return self._assets
 
     def generate_markdown(self):
@@ -57,7 +57,5 @@ class Catalog:
             os.makedirs(folder, exist_ok=True)
             with open(path, 'w', encoding='utf8') as out:
                 out.write(content)
-            # if k > 1000:
-            #     break
         if os.path.isfile(f'{self.folder}/style.css'):
             shutil.copyfile(f'{self.folder}/style.css', f'{self.folder}/docs/style.css')
