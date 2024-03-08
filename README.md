@@ -57,7 +57,7 @@ To get started, let's download a catalog configuration example and play with it.
 catalog download bigquery_public_data
 ```
 
-> You will find the following files in the folder:
+> You will find in the folder:
 > 
 > - `assets file`: a file containing the list of the assets you want to put in your documentation. It can be a parquet file named `assets.parquet` or a [json lines file](https://medium.com/@sujathamudadla1213/difference-between-ordinary-json-and-json-lines-fc746f93d75e) named  `assets.jsonl`. Each asset in the file must have the following fields:
 >   - `asset_type`: for example: `table`.
