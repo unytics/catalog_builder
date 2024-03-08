@@ -65,7 +65,7 @@ catalog download bigquery_public_data
 >   - `data`: a dict of attributes used to generate the documentation. For example `{"name": "foo"}`
 > - `generate_assets_file.py`: the python script used to (re)generate the `assets file`.
 > - `requirements.txt`: the python requirements needed by `generate_assets_file.py`.
-> - `templates`: a folder which includes a jinja-template markdown-file for every `asset_type`. These templates are used to generate a markdown documentation file for each asset.
+> - `templates`: a folder which includes a jinja-template markdown-file for each `asset_type`. These templates are used to generate a markdown documentation file for each asset.
 > - `mkdocs.yml`: the mkdocs configuration file used by mkdocs to build the documentation website from the generated markdown files.
 
 
