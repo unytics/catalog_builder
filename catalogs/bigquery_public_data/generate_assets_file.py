@@ -117,10 +117,7 @@ datasets = bigquery.list_datasets(PROJECT)
 datasets = [d.dataset_id for d in datasets]
 
 with open(f'{HERE}/tmp_assets.jsonl', 'w', encoding='utf-8') as out:
-    content = json.dumps({'asset_type': 'homepage', 'path': 'index.md', 'data': {'datasets': datasets}})
-    out.write(content + '\n')
-    for dataset in datasets:
-        dataset_id = dataset.dataset_id
+    for dataset_id in datasets:
         print(dataset_id)
         try:
             dataset = bigquery.get_dataset(f'{PROJECT}.{dataset_id}')
@@ -151,6 +148,8 @@ with open(f'{HERE}/tmp_assets.jsonl', 'w', encoding='utf-8') as out:
         content = '\n'.join([json.dumps(asset) for asset in assets])
         out.write(content + '\n')
 
-
 df = pd.read_json(f'{HERE}/tmp_assets.jsonl', lines=True)
+datasets = list(df.loc[(df['asset_type'] == 'dataset')]['data'].map(lambda data: data['name']))
+homepage = pd.DataFrame({'asset_type': ['homepage'], 'path': ['index.md'], 'data': [{'datasets': datasets}]})
+df = pd.concat([df, homepage])
 df.to_parquet(f'{HERE}/assets.parquet')

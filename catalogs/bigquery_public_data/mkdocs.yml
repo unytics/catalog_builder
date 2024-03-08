@@ -1,4 +1,4 @@
-site_name: BigQuery Public Datasets
+site_name: BigQuery Public Data
 site_url: http://catalogs.unytics.io/bigquery_public_data/
 extra_css:
   - style.css
