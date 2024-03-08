@@ -43,15 +43,11 @@
 
 > `catalog` is the CLI (command-line-interface) of CatalogBuilder to generate, show & deploy the documentation.
 
-<br>
-
 ### 3.1 Install `catalog` CLI 🛠️
 
 ``` sh
 pip install catalog-builder
 ```
-
-<br>
 
 ### 3.2 Create your first documentation configuration 👨‍💻
 
@@ -73,8 +69,6 @@ To get started, let's download  a catalog configuration example from the GitHub 
 > - `templates`: a folder which includes a jinja-template markdown-file for each `asset_type`. These templates are used to generate a markdown documentation file for each asset.
 > - `mkdocs.yml`: the mkdocs configuration file used by mkdocs to build the documentation website from the generated markdown files.
 
-<br>
-
 
 ### 3.3 Build your catalog website 👾
 
@@ -85,8 +79,6 @@ catalog build bigquery_public_data
 > 1. For each asset of the `assets file`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/bigquery_public_data/docs/` at `documentation_path`.
 > 2. Mkdocs will then build the documentation website from the markdown files into `catalogs/bigquery_public_data/site` (using `mkdocs.yml` configuration file).
 
-<br>
-
 
 ### 3.4 Run your catalog website locally ⚡
 
@@ -96,8 +88,6 @@ catalog serve bigquery_public_data
 
 > You can now see the generated documentation website at http://localhost:8000.
 
-
-<br>
 
 ### 3.5 Deploy the documentation website! 🚀
 
