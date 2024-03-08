@@ -97,7 +97,7 @@ catalog serve bigquery_public_data
 catalog gh-deploy bigquery_public_data
 ```
 
-Mkdocs will [deploy the site on GitHub pages](https://www.mkdocs.org/user-guide/deploying-your-docs/) (this only works if you are on a github repository).
+> Mkdocs will [deploy the site on GitHub pages](https://www.mkdocs.org/user-guide/deploying-your-docs/) (this only works if you are on a github repository).
 
 
 **B. To deploy elsewhere**:
