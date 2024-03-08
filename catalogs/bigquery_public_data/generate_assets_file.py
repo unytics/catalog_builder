@@ -8,6 +8,8 @@ PROJECT = 'bigquery-public-data'
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 DATASET_TABLES_QUERY = '''
+
+
 with
 
 
@@ -16,14 +18,14 @@ with
 ----------------------------------------
 tables as (
   select 
-    dataset_id || '.' || table_id as table,
+    table_id as table,
     *,
   from {project}.{dataset}.__TABLES__
 ),
 
 table_descriptions as (
   select
-    table_schema || '.' || table_name as table,
+    table_name as table,
     regexp_extract(option_value, '^"(.*)"$') as description,
   from {project}.{dataset}.INFORMATION_SCHEMA.TABLE_OPTIONS
   where option_name = 'description'
@@ -32,7 +34,7 @@ table_descriptions as (
 columns as (
   select
     field_path as name,
-    table_schema || '.' || table_name as table,
+    table_name as table,
     data_type,
     ifnull(description, '') as description,
   from {project}.{dataset}.INFORMATION_SCHEMA.COLUMN_FIELD_PATHS
@@ -41,7 +43,7 @@ columns as (
 columns_details as (
   select
     column_name as name,
-    table_schema || '.' || table_name as table,
+    table_name as table,
     ordinal_position,
     is_partitioning_column = 'YES' as is_partitioning_column,
   from {project}.{dataset}.INFORMATION_SCHEMA.COLUMNS
@@ -58,7 +60,7 @@ columns_joined as (
   left join columns_details using(table, name)
 ),
 
-paritioning_columns as (
+partitioning_columns as (
   select 
     table, 
     name as partitioning_column,
@@ -80,7 +82,7 @@ tables_joined as (
   from tables
   left join table_descriptions using(table)
   left join table_columns using(table)
-  left join paritioning_columns using(table)
+  left join partitioning_columns using(table)
 )
 
 
@@ -88,25 +90,25 @@ tables_joined as (
 --              FINAL                 --
 ----------------------------------------
 select 
-  'table' as asset_type,
-  replace(table, '.', '/') as path,
-  struct(
-    table_id as name,
-    string(date(timestamp_millis(creation_time))) as created_at,
-    string(date(timestamp_millis(last_modified_time))) as last_modified_at,
-    format("%'d", row_count) as row_count,
-    case 
-      when size_bytes / pow(2, 40) > 1 then format('%.2f TB', size_bytes / pow(2, 40))
-      when size_bytes / pow(2, 30) > 1 then format('%.2f GB', size_bytes / pow(2, 30))
-      else format('%.2f MB', size_bytes / pow(2, 20))
-    end as size,
-    type,
-    ifnull(description, '') as description,
-    ifnull(partitioning_column, '') as partitioning_column,
-    columns
-  ) as data,
+  table_id as name,
+  string(date(timestamp_millis(creation_time))) as created_at,
+  string(date(timestamp_millis(last_modified_time))) as last_modified_at,
+  format("%'d", row_count) as row_count,
+  case 
+    when size_bytes / pow(2, 40) > 1 then format('%.2f TB', size_bytes / pow(2, 40))
+    when size_bytes / pow(2, 30) > 1 then format('%.2f GB', size_bytes / pow(2, 30))
+    else format('%.2f MB', size_bytes / pow(2, 20))
+  end as size,
+  type,
+  ifnull(description, '') as description,
+  ifnull(partitioning_column, '') as partitioning_column,
+  columns,
 from tables_joined
 where date(timestamp_millis(last_modified_time)) >= current_date - 31
+
+
+
+
 
 
 '''
@@ -129,7 +131,10 @@ with open(f'{HERE}/tmp_assets.jsonl', 'w', encoding='utf-8') as out:
         except:
             print(f'COULD NOT GET TABLES FOR DATASET {dataset_id}')
             continue
-        tables = [dict(t) for t in tables]
+        tables = [
+            {'asset_type': 'table', 'path': f'{dataset_id}/{t.name}', 'data': dict(t)}
+            for t in tables
+        ]
         if not tables:
             continue
         dataset = {
