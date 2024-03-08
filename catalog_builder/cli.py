@@ -61,7 +61,7 @@ def handle_error(f):
 @handle_error
 def download(catalog_name):
     '''
-    Download CATALOG_NAME configuration folder from catalogs_builder GitHub
+    Download CATALOG_NAME configuration folder from `catalog_builder` GitHub
     '''
     if os.path.isdir(f'catalogs/{catalog_name}'):
         raise CatalogException(f'`catalogs/{catalog_name}` folder already exists. If you wish to download it again please remove the folder beforehand.')
