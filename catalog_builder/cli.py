@@ -102,6 +102,6 @@ def gcs(catalog_name):
     config = load_yaml_file(config_file)
     site_url = config['site_url']
     destination = site_url.split('://')[1]
-    destination = destination.rstrip('/')
+    destination = destination + ('/' if not destination.endswith('/') else '')
     print_info(f'Copying site to destination `{destination}`')
-    exec(f'gcloud storage cp -r {catalog.folder}/site gs://{destination}')
+    exec(f'gcloud storage cp -r {catalog.folder}/site/* gs://{destination}')
