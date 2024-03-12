@@ -159,6 +159,13 @@ with open(f'{HERE}/tmp_assets.jsonl', 'w', encoding='utf-8') as out:
         out.write(content + '\n')
 
 df = pd.read_json(f'{HERE}/tmp_assets.jsonl', lines=True)
+df['data'] = df['data'].map(
+    lambda data:
+    {
+        **data, 
+        **{'description': data['description'].replace('(/bigquery', '(https://console.cloud.google.com/bigquery')},
+    }
+)
 datasets = list(df.loc[(df['asset_type'] == 'dataset')]['data'].map(lambda data: data['name']))
 homepage = pd.DataFrame({'asset_type': ['homepage'], 'path': ['index.md'], 'data': [{'datasets': datasets}]})
 df = pd.concat([df, homepage])
