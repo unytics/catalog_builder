@@ -34,7 +34,7 @@
 {{ (description or '<span style="color: var(--md-default-fg-color--lighter);">No description</span>') | indent(4, false, true) }}
 
 
-[Open in BigQuery 🡒](https://console.cloud.google.com/bigquery?ws=!1m5!1m4!4m3!1sbigquery-public-data!2s[DATASET_NAME]!3s{{ name }})
+[Open in BigQuery :material-open-in-new:](https://console.cloud.google.com/bigquery?ws=!1m5!1m4!4m3!1sbigquery-public-data!2s{{ dataset }}!3s{{ name }})
 
 
 ---
