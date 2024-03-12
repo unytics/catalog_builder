@@ -21,6 +21,7 @@ tables as (
     table_id as table,
     *,
   from {project}.{dataset}.__TABLES__
+  where not starts_with(table_id, '_') 
 ),
 
 table_descriptions as (
@@ -132,7 +133,11 @@ with open(f'{HERE}/tmp_assets.jsonl', 'w', encoding='utf-8') as out:
             print(f'COULD NOT GET TABLES FOR DATASET {dataset_id}')
             continue
         tables = [
-            {'asset_type': 'table', 'path': f'{dataset_id}/{t.name}', 'data': dict(t)}
+            {
+                'asset_type': 'table', 
+                'path': f'{dataset_id}/{t.name}', 
+                'data': {**{'dataset': dataset_id}, **dict(t)}
+            }
             for t in tables
         ]
         if not tables:
