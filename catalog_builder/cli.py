@@ -2,10 +2,9 @@ import os
 
 import click
 from click_help_colors import HelpColorsGroup
-import yaml
 
 from .catalogs import Catalog
-from .utils import handle_error, print_info, download_github_folder, exec, CatalogException
+from .utils import handle_error, print_info, download_github_folder, exec, CatalogException, load_yaml_file
 
 
 @click.group(
@@ -100,7 +99,7 @@ def gcs(catalog_name):
         raise CatalogException(f'`{catalog.folder}/site` folder does not exist. Please build it with `build` command')
     if not os.path.isfile(config_file):
         raise CatalogException(f'Missing config file {config_file}')
-    config = yaml.safe_load(open(config_file, encoding='utf-8').read())
+    config = load_yaml_file(config_file)
     site_url = config['site_url']
     destination = site_url.split('://')[1]
     destination = destination.rstrip('/')

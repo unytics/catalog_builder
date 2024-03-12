@@ -7,6 +7,7 @@ import sys
 
 import click
 import requests
+import yaml
 
 
 class CatalogException(Exception):
@@ -71,3 +72,15 @@ def exec(command):
         return subprocess.check_output(command, shell=True).decode().strip()
     except subprocess.CalledProcessError as e:
         raise CatalogException("See error above. " + e.output.decode(errors="ignore").strip())
+
+
+
+
+def load_yaml_file(filename):
+    class SafeLoaderIgnoreUnknown(yaml.SafeLoader):
+        def ignore_unknown(self, node):
+            return None 
+
+    SafeLoaderIgnoreUnknown.add_constructor(None, SafeLoaderIgnoreUnknown.ignore_unknown)
+    content = open(filename, encoding='utf-8').read()
+    return yaml.load(content, Loader=SafeLoaderIgnoreUnknown)
