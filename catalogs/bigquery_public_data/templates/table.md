@@ -36,6 +36,9 @@
 
 [Open in BigQuery :material-open-in-new:](https://console.cloud.google.com/bigquery?ws=!1m5!1m4!4m3!1sbigquery-public-data!2s{{ dataset }}!3s{{ name }})
 
+[Open in Looker Studio :material-open-in-new:](javascript:openLookerStudio\(\);) *(:warning: this costs you a full scan of some columns)*
+
+
 
 ---
 
@@ -50,3 +53,14 @@
 
 
 
+<script>
+function openLookerStudio() {
+
+  if (!localStorage.billingBigQueryProject) {
+    localStorage.billingBigQueryProject = prompt('To open Looker Studio, please enter your BigQuery Billing Project');
+  }
+  const url = `https://lookerstudio.google.com/u/0/reporting/create?c.mode=edit&c.source=BQ_UI&ds.type=TABLE&ds.connector=BIG_QUERY&ds.billingProjectId=${localStorage.billingBigQueryProject}&ds.projectId=bigquery-public-data&ds.tableId={{ name }}&ds.datasetId={{ dataset }}&ds.sqlType=STANDARD_SQL`;
+  window.open(url);
+
+}
+</script>
