@@ -53,7 +53,7 @@ def get_models():
 
 def get_schemas_from_sources(sources):
     schemas = sources.copy()
-    schemas['path'] = schemas['database'] + '/' + schemas['schema'] + '/index'
+    schemas['path'] = schemas['schema'] + '/index'
     schemas = schemas.groupby('path').agg(
         name=('schema', 'max'),
         description=('source_description', 'max'),
@@ -64,21 +64,9 @@ def get_schemas_from_sources(sources):
     return schemas[['asset_type', 'path', 'data']]
 
 
-def get_databases_from_sources(sources):
-    databases = sources.copy()
-    databases['path'] = databases['database'] + '/index'
-    databases = databases.groupby('path').agg(
-        name=('database', 'max'),
-        schemas=('schema', lambda x: sorted(list(set(x)))),
-    ).reset_index()
-    databases['asset_type'] = 'database'
-    databases['data'] = databases[['name', 'schemas']].to_dict(orient='records')
-    return databases[['asset_type', 'path', 'data']]
-
-
 def transform_sources(sources):
     sources['asset_type'] = 'source'
-    sources['path'] = sources['database'] + '/' + sources['schema'] + '/' + sources['name']
+    sources['path'] = sources['schema'] + '/' + sources['name']
     sources['type'] = sources['metadata'].map(lambda metadata: metadata['type'])
     sources['owner'] = sources['metadata'].map(lambda metadata: metadata['owner'])
     sources['size'] = sources['stats'].map(lambda stats: stringify_bytes(stats.get('bytes', {}).get('value', -1)))
@@ -91,20 +79,19 @@ def transform_sources(sources):
 
 
 sources = get_sources()
-databases = get_databases_from_sources(sources)
 schemas = get_schemas_from_sources(sources)
 sources = transform_sources(sources)
 source_homepage = pd.DataFrame({
     'asset_type': ['source_homepage'],
     'path': ['index'],
-    'data': [{'databases': databases['data'].map(lambda data: data['name']).to_list()}],
+    'data': [{'schemas': schemas['data'].map(lambda data: data['name']).to_list()}],
 })
 
 
 # models = get_models()
 # breakpoint()
 
-assets = pd.concat([databases, schemas, sources, source_homepage])
+assets = pd.concat([schemas, sources, source_homepage])
 assets.to_parquet(f'{HERE}/assets.parquet')
 
 

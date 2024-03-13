@@ -11,10 +11,10 @@
 
 <div class="grid cards" markdown>
 
--   **Databases**
+-   **Schemas**
 
-    {% for database in databases %}
-    - [{{ database }}]({{ database }}/index.md)
+    {% for schema in schemas %}
+    - [{{ schema }}]({{ schema }}/index.md)
     {% endfor %}
 
 </div>
