@@ -63,6 +63,26 @@ def serve(catalog_name):
     exec(f'python -m http.server --directory {catalog.folder}/site')
 
 
+@cli.command()
+@click.argument('catalog_name')
+@handle_error
+def build_and_serve(catalog_name):
+    '''
+    Serve CATALOG_NAME website on http://localhost:8000
+    '''
+    catalog = Catalog(catalog_name)
+    print_info(f'Generating mardown files into {catalog.folder}/docs')
+    catalog.generate_markdown()
+    config_file = f'catalogs/{catalog_name}/mkdocs.yml'
+    if not os.path.isfile(config_file):
+        raise CatalogException(f'Missing config file {config_file}')
+    print_info(f'Building site from mardown files into {catalog.folder}/site')
+    exec(f'mkdocs build --config-file {config_file}')
+    print_info(f'Serving website. Open this url in your browser --> http://localhost:8000 !')
+    exec(f'python -m http.server --directory {catalog.folder}/site')
+
+
+
 @cli.group()
 def deploy():
     '''
