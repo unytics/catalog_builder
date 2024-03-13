@@ -1,12 +1,15 @@
-site_name: dbt Gitlab Team
+site_name: Gitlab Team dbt
 site_url: http://catalogs.unytics.io/bigquery_public_data/
 extra_css:
   - style.css
 theme:
   name: material
+  logo: https://cdn-icons-png.flaticon.com/256/5968/5968853.png
+  palette:
+    primary: black  
   features:
     - navigation.instant
-    # - navigation.tabs
+    - navigation.tabs
     - navigation.prune
     - navigation.indexes     
 markdown_extensions:
