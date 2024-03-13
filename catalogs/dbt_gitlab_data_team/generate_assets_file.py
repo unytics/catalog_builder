@@ -10,11 +10,24 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 MANIFEST_FILE = f'{HERE}/tmp_manifest.json'
 CATALOG_FILE = f'{HERE}/tmp_catalog.json'
 
+COMMON_COLUMNS = ['database', 'schema', 'name', 'type', 'description', 'created_at', 'owner', 'size', 'last_modified', 'columns']
 ASSET_TYPES = {
     'source': {
-        'path': lambda df: 'sources/' + df['schema'] + '/' + df['name'],
-        'data_columns': ['database', 'schema', 'name', 'type', 'loader', 'description', 'created_at', 'owner', 'size', 'last_modified', 'columns'],
+        'path': lambda df: 'Raw Data/' + df['schema'] + '/' + df['name'],
+        'data_columns': COMMON_COLUMNS + ['loader'],
     },
+    'node': {
+        'path': lambda df: (
+            df['database'].replace({'RAW': 'Raw Data', 'PREP': 'Source Models', 'PROD': 'Models'}) + '/' + 
+            df['schema'].str.replace('restricted_safe_', '') + '/' + 
+            df['name']
+        ),
+        'data_columns': COMMON_COLUMNS + ['resource_type', 'raw_code'], # 'config', 'depends_on'
+    },
+    'schema': {
+        'path': lambda df: df['path'],
+        'data_columns': ['name', 'tables'],
+    },    
     'exposure': {
         'path': lambda df: '',
         'data_columns': ['name', 'owner', 'type', 'description', 'url', 'depends_on'],
@@ -48,8 +61,6 @@ def stringify_bytes(bytes):
     return f'{bytes} B'
     
 
-
-
 def get_dataframe(key):
     if key == 'exposures':
         df = pd.DataFrame(MANIFEST[key].values())
@@ -79,30 +90,51 @@ def format_df(df, asset_type):
     return df[['asset_type', 'path', 'data']]
 
 
-
-def get_schemas_from_sources(sources):
-    schemas = sources.copy()
-    schemas['path'] = 'sources/' + schemas['schema'] + '/index'
+def get_schemas_from_nodes(nodes):
+    schemas = nodes.copy()
+    schemas['path'] = schemas['path'].map(lambda path: '/'.join(path.split('/')[:-1]) + '/index')
+    schemas['name'] = schemas['path'].map(lambda path: path.split('/')[1])
+    schemas['table'] = schemas['data'].map(lambda data: data['name'])
     schemas = schemas.groupby('path').agg(
-        name=('schema', 'max'),
-        description=('source_description', 'max'),
-        tables=('name', list),
+        name=('name', 'max'),
+        tables=('table', list),
     ).reset_index()
-    schemas['asset_type'] = 'schema'
-    schemas['data'] = schemas[['name', 'description', 'tables']].to_dict(orient='records')
-    return schemas[['asset_type', 'path', 'data']]
-
+    return schemas
 
 sources = get_dataframe('sources')
-schemas = get_schemas_from_sources(sources)
-sources = format_df(sources, 'source')
-source_homepage = pd.DataFrame({
-    'asset_type': ['source_homepage'],
-    'path': ['sources/index'],
-    'data': [{'schemas': schemas['data'].map(lambda data: data['name']).to_list()}],
+nodes = get_dataframe('nodes')
+
+
+
+raw_data_schemas = sorted(pd.concat([
+    sources['schema'],
+    nodes.loc[nodes['database'] == 'RAW']['schema'],
+]).unique())
+raw_data = pd.DataFrame({
+    'asset_type': ['raw_data'],
+    'path': ['Raw Data/index'],
+    'data': [{'schemas': raw_data_schemas}],
 })
 
-nodes = get_dataframe('nodes')
+source_models_schemas = sorted(nodes.loc[nodes['database'] == 'PREP']['schema'].unique())
+source_models = pd.DataFrame({
+    'asset_type': ['source_models'],
+    'path': ['Source Models/index'],
+    'data': [{'schemas': source_models_schemas}],
+})
+
+
+sources = format_df(sources, 'source')
+nodes = format_df(nodes, 'node')
+schemas = get_schemas_from_nodes(pd.concat([sources, nodes]))
+schemas = format_df(schemas, 'schema')
+
+# snapshots = nodes.loc[nodes['resource_type'] == 'snapshot']
+# models = nodes.loc[nodes['resource_type'] == 'model']
+# prep_models = models.loc[nodes['database'] == 'PREP']
+# prod_models = models.loc[nodes['database'] != 'PROD']
+# raw_models = models.loc['']
+
 
 exposures = get_dataframe('exposures')
 exposures = format_df(exposures, 'exposure')
@@ -130,16 +162,9 @@ home = pd.DataFrame({
 # config
 # depends_on
 # tags
-assets = pd.concat([home, exposures, schemas, sources, source_homepage])
+assets = pd.concat([home, raw_data, source_models, schemas, exposures, sources, nodes])
 assets.to_parquet(f'{HERE}/assets.parquet')
 
 
 # sources['created_at'] = sources['created_at'].map(lambda ts: datetime.datetime.utcfromtimestamp(1347517370).strftime('%Y-%m-%d %H:%M:%S'))
 # sources['row_count'] = sources['stats'].map(lambda stats: stats.get('row_count', {}).get('value', 10))
-# sources = list(MANIFEST['sources'].values())
-# nodes = list(MANIFEST['nodes'].values())
-# models = [n for n in nodes if n['resource_type'] in ['model', 'seed', 'snapshot']]
-
-
-
-

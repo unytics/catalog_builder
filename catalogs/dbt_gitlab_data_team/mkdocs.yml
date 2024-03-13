@@ -1,5 +1,5 @@
 site_name: Gitlab Team dbt
-site_url: http://catalogs.unytics.io/bigquery_public_data/
+site_url: http://catalogs.unytics.io/dbt_gitlab_data_team/
 extra_css:
   - style.css
 theme:
@@ -12,6 +12,7 @@ theme:
     - navigation.tabs
     - navigation.prune
     - navigation.indexes     
+    - content.tabs.link
 markdown_extensions:
   - attr_list
   - md_in_html  
