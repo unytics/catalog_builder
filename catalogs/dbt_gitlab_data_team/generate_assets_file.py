@@ -17,11 +17,7 @@ ASSET_TYPES = {
         'data_columns': COMMON_COLUMNS + ['loader'],
     },
     'node': {
-        'path': lambda df: (
-            df['database'].replace({'RAW': 'Raw Data', 'PREP': 'Source Models', 'PROD': 'Models'}) + '/' + 
-            df['schema'].str.replace('restricted_safe_', '') + '/' + 
-            df['name']
-        ),
+        'path': lambda df: get_node_path(df),
         'data_columns': COMMON_COLUMNS + ['resource_type', 'raw_code'], # 'config', 'depends_on'
     },
     'schema': {
@@ -59,6 +55,59 @@ def stringify_bytes(bytes):
     if bytes > pow(2, 10):
         return f'{bytes / pow(2, 10):,.1f} kB'
     return f'{bytes} B'
+
+
+def get_node_path(df):
+    paths = []
+    models_tree = {}
+    for node in df.to_dict(orient='records'):
+        schema = node['schema']
+        if schema.startswith('restricted_safe_'):
+            schema = schema[len('restricted_safe_'):]
+        schema_prefix, schema_suffix = schema.split('_', 1) if '_' in schema else (schema, '')
+        if schema_prefix == 'workspace':
+            paths.append('Team Workspaces/' + schema_suffix + '/' + node['name'])
+        elif node['database'] == 'RAW':
+            paths.append(f"Raw Data/{schema}/{node['name']}")
+        elif node['database'] == 'PREP':
+            paths.append(f"Source Models/{schema}/{node['name']}")
+        elif schema.lower() == 'legacy':
+            paths.append(f"Legacy/{schema}/{node['name']}")
+        elif node['name'].startswith(('prep_', 'fct_', 'dim_', 'mart_', 'rpt_', 'pump_', 'map_', 'bdg_')):
+            paths.append(f"Models/{schema}/{node['name']}")
+            _dict = models_tree
+            for part in node['name'].split('_')[1:]:
+                _dict[part] = _dict.get(part, {}) 
+                _dict = _dict[part]
+            _dict['item'] = {}
+        else:
+            paths.append(f"Legacy/{schema}/{node['name']}")
+
+    iterate = True
+    while iterate:
+        iterate = False
+        models_tree_keys = list(models_tree.keys())
+        nb_keys = len(models_tree_keys)
+        for key in models_tree_keys:
+            subkeys = list(models_tree[key].keys())
+            if len(subkeys) == 1:
+                subkey = subkeys[0]
+                if subkey == 'item':
+                    continue
+                models_tree[key + '_' + subkey] = models_tree[key][subkey]
+                del models_tree[key]
+                iterate = True
+    models_folders = models_tree.keys()
+
+    paths_with_subfolders = []
+    for path in paths:
+        if path.startswith('Models/'):
+            _, schema, name = path.split('/')
+            prefix, suffix = name.split('_', 1)
+            folder = next(f for f in models_folders if suffix.startswith(f))
+            path = f'Models/{schema}/{folder}/{prefix}_{suffix}'
+        paths_with_subfolders.append(path)
+    return paths_with_subfolders
     
 
 def get_dataframe(key):
