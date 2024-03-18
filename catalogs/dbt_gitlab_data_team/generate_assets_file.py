@@ -144,15 +144,15 @@ nodes = get_dataframe('nodes')
 
 
 
-raw_data_schemas = sorted(pd.concat([
-    sources['schema'],
-    nodes.loc[nodes['database'] == 'RAW']['schema'],
-]).unique())
-raw_data = pd.DataFrame({
-    'asset_type': ['raw_data'],
-    'path': ['Raw Data/index'],
-    'data': [{'schemas': raw_data_schemas}],
-})
+# raw_data_schemas = sorted(pd.concat([
+#     sources['schema'],
+#     nodes.loc[nodes['database'] == 'RAW']['schema'],
+# ]).unique())
+# raw_data = pd.DataFrame({
+#     'asset_type': ['raw_data'],
+#     'path': ['Raw Data/index'],
+#     'data': [{'schemas': raw_data_schemas}],
+# })
 
 source_models_schemas = sorted(nodes.loc[nodes['database'] == 'PREP']['schema'].unique())
 source_models = pd.DataFrame({
@@ -198,7 +198,7 @@ home = pd.DataFrame({
 # config
 # depends_on
 # tags
-assets = pd.concat([home, raw_data, source_models, exposures, sources, nodes])
+assets = pd.concat([home, source_models, exposures, sources, nodes])
 assets.to_parquet(f'{HERE}/assets.parquet')
 
 
