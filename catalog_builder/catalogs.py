@@ -17,6 +17,8 @@ search:
 
 # {{ name | title }}
 
+{{ content }}
+
 <div class="grid cards" markdown>
 
 -   {% for obj in files_and_folders -%}
@@ -46,11 +48,13 @@ class Catalog:
         if not os.path.isdir(template_folder):
             os.makedirs(template_folder)
             return
-        for f in os.listdir(template_folder):
-            template = open(f'{template_folder}/{f}', encoding='utf-8').read()
-            template = jinja2.Template(template)
-            asset_type =  f.replace('.md', '')
-            self.templates[asset_type] = template
+        for root, folders, files in os.walk(template_folder):
+            for file in files:
+                template = open(f'{root}/{file}', encoding='utf-8').read()
+                template = jinja2.Template(template)
+                filename = f'{root}/{file}'.replace(template_folder + '/', '')
+                asset_type =  filename.replace('.md', '')
+                self.templates[asset_type] = template
 
     @property
     def assets(self):
@@ -91,11 +95,16 @@ class Catalog:
             if 'index.md' in files:
                 continue
             root_name = os.path.basename(root)
+            filename = root.replace(f'{self.folder}/docs/', '') + '/index'
+            content = ''
+            if filename in self.templates:
+                content = self.templates[filename].render()
             files = [{'name': f, 'type': 'file'} for f in files]
             folders = [{'name': f, 'type': 'folder'} for f in folders]
             files_and_folders = sorted(files + folders, key=lambda x: x['name'])
             content = FOLDER_TEMPLATE.render(
                 files_and_folders=files_and_folders,
                 name=root_name.replace('_', ' '),
+                content=content
             )
             open(f'{root}/index.md', 'w', encoding='utf-8').write(content)

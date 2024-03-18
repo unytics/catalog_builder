@@ -67,8 +67,12 @@ def get_node_path(df):
             path = f'workspaces/workspace_data/{node["package_name"]}/{path}'
         elif node['database'] == 'RAW':
             path = f'raw_data/{path}'            
-        elif not path.startswith(('sources/', 'workspaces/', 'legacy/')):
+        elif path.startswith(('sources/', 'workspaces/', 'legacy/')):
+            path = path
+        elif path.startswith(('common', 'mart')):
             path = f'models/{path}'
+        else:
+            path = f'legacy/{path}'
         paths.append(path)
 
     return paths
