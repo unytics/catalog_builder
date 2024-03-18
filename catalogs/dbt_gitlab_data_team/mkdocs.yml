@@ -4,14 +4,14 @@ extra_css:
   - style.css
 nav:
   - Welcome!: index.md
-  - Team Workspaces: 
-    - ... | team_workspaces/**
   - Models: 
     - ... | models/**
   - Source Models:
-    - ... | source_models/**
+    - ... | sources/**
   - Raw Data:
     - ... | raw_data/**
+  - Team Workspaces: 
+    - ... | workspaces/**
   - Exposures: exposures/index.md
   - Legacy:
     - ... | legacy/**

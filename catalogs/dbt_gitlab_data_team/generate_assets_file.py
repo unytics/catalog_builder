@@ -1,3 +1,6 @@
+'''
+TODO: if snapshot depends only of source, put into sources else put into models
+'''
 import json
 import os
 import urllib.request
@@ -10,7 +13,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 MANIFEST_FILE = f'{HERE}/tmp_manifest.json'
 CATALOG_FILE = f'{HERE}/tmp_catalog.json'
 
-COMMON_COLUMNS = ['database', 'schema', 'name', 'type', 'description', 'created_at', 'owner', 'size', 'last_modified', 'columns']
+COMMON_COLUMNS = ['database', 'schema', 'name', 'type', 'description', 'created_at', 'owner', 'size', 'modified_at', 'columns']
 ASSET_TYPES = {
     'source': {
         'path': lambda df: 'raw_data/' + df['schema'] + '/' + df['name'],
@@ -20,10 +23,6 @@ ASSET_TYPES = {
         'path': lambda df: get_node_path(df),
         'data_columns': COMMON_COLUMNS + ['resource_type', 'raw_code'], # 'config', 'depends_on'
     },
-    'schema': {
-        'path': lambda df: df['path'],
-        'data_columns': ['name', 'tables'],
-    },    
     'exposure': {
         'path': lambda df: '',
         'data_columns': ['name', 'owner', 'type', 'description', 'url', 'depends_on'],
@@ -59,55 +58,20 @@ def stringify_bytes(bytes):
 
 def get_node_path(df):
     paths = []
-    models_tree = {}
     for node in df.to_dict(orient='records'):
-        schema = node['schema']
-        if schema.startswith('restricted_safe_'):
-            schema = schema[len('restricted_safe_'):]
-        schema_prefix, schema_suffix = schema.split('_', 1) if '_' in schema else (schema, '')
-        if schema_prefix == 'workspace':
-            paths.append('team_workspaces/' + schema_suffix + '/' + node['name'])
+        path = node['path'].replace('/restricted_safe/', '/').lower()
+        path = path.split('.')[0]
+        if node['resource_type'] == 'seed':
+            path = f'raw_data/seeds/{path}'
+        elif node['package_name'] != 'gitlab_snowflake':
+            path = f'workspaces/workspace_data/{node["package_name"]}/{path}'
         elif node['database'] == 'RAW':
-            paths.append(f"raw_data/{schema}/{node['name']}")
-        elif node['database'] == 'PREP':
-            paths.append(f"source_models/{schema}/{node['name']}")
-        elif schema.lower() == 'legacy':
-            paths.append(f"legacy/{schema}/{node['name']}")
-        elif node['name'].startswith(('prep_', 'fct_', 'dim_', 'mart_', 'rpt_', 'pump_', 'map_', 'bdg_')):
-            paths.append(f"models/{schema}/{node['name']}")
-            _dict = models_tree
-            for part in node['name'].split('_')[1:]:
-                _dict[part] = _dict.get(part, {}) 
-                _dict = _dict[part]
-            _dict['item'] = {}
-        else:
-            paths.append(f"legacy/{schema}/{node['name']}")
+            path = f'raw_data/{path}'            
+        elif not path.startswith(('sources/', 'workspaces/', 'legacy/')):
+            path = f'models/{path}'
+        paths.append(path)
 
-    iterate = True
-    while iterate:
-        iterate = False
-        models_tree_keys = list(models_tree.keys())
-        nb_keys = len(models_tree_keys)
-        for key in models_tree_keys:
-            subkeys = list(models_tree[key].keys())
-            if len(subkeys) == 1:
-                subkey = subkeys[0]
-                if subkey == 'item':
-                    continue
-                models_tree[key + '_' + subkey] = models_tree[key][subkey]
-                del models_tree[key]
-                iterate = True
-    models_folders = models_tree.keys()
-
-    paths_with_subfolders = []
-    for path in paths:
-        if path.startswith('models/'):
-            _, schema, name = path.split('/')
-            prefix, suffix = name.split('_', 1)
-            folder = next(f for f in models_folders if suffix.startswith(f))
-            path = f'models/{schema}/{folder}/{prefix}_{suffix}'
-        paths_with_subfolders.append(path)
-    return paths_with_subfolders
+    return paths
     
 
 def get_dataframe(key):
@@ -123,7 +87,7 @@ def get_dataframe(key):
         df['type'] = df['metadata'].map(lambda metadata: metadata['type'])
         df['owner'] = df['metadata'].map(lambda metadata: metadata['owner'])
         df['size'] = df['stats'].map(lambda stats: stringify_bytes(stats.get('bytes', {}).get('value', -1)))
-        df['last_modified'] = df['stats'].map(lambda stats: stats.get('last_modified', {}).get('value'))
+        df['modified_at'] = df['stats'].map(lambda stats: stats.get('last_modified', {}).get('value'))
         df['columns'] = df['columns'].map(dict.values).map(list)
     # if 'depends_on' in df.columns:
     #     df['depends_on'] = df['depends_on'].map(lambda dep: dep['nodes'])
