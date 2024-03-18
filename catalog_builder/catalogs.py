@@ -10,7 +10,12 @@ from .utils import CatalogException
 CATALOGS_CONF_FOLDER = 'catalogs'
 
 
-FOLDER_TEMPLATE = jinja2.Template('''# {{ name }}
+FOLDER_TEMPLATE = jinja2.Template('''---
+search:
+  exclude: true
+---
+
+# {{ name }}
 
 <div class="grid cards" markdown>
 
