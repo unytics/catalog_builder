@@ -13,7 +13,7 @@ CATALOG_FILE = f'{HERE}/tmp_catalog.json'
 COMMON_COLUMNS = ['database', 'schema', 'name', 'type', 'description', 'created_at', 'owner', 'size', 'last_modified', 'columns']
 ASSET_TYPES = {
     'source': {
-        'path': lambda df: 'Raw Data/' + df['schema'] + '/' + df['name'],
+        'path': lambda df: 'raw_data/' + df['schema'] + '/' + df['name'],
         'data_columns': COMMON_COLUMNS + ['loader'],
     },
     'node': {
@@ -66,22 +66,22 @@ def get_node_path(df):
             schema = schema[len('restricted_safe_'):]
         schema_prefix, schema_suffix = schema.split('_', 1) if '_' in schema else (schema, '')
         if schema_prefix == 'workspace':
-            paths.append('Team Workspaces/' + schema_suffix + '/' + node['name'])
+            paths.append('team_workspaces/' + schema_suffix + '/' + node['name'])
         elif node['database'] == 'RAW':
-            paths.append(f"Raw Data/{schema}/{node['name']}")
+            paths.append(f"raw_data/{schema}/{node['name']}")
         elif node['database'] == 'PREP':
-            paths.append(f"Source Models/{schema}/{node['name']}")
+            paths.append(f"source_models/{schema}/{node['name']}")
         elif schema.lower() == 'legacy':
-            paths.append(f"Legacy/{schema}/{node['name']}")
+            paths.append(f"legacy/{schema}/{node['name']}")
         elif node['name'].startswith(('prep_', 'fct_', 'dim_', 'mart_', 'rpt_', 'pump_', 'map_', 'bdg_')):
-            paths.append(f"Models/{schema}/{node['name']}")
+            paths.append(f"models/{schema}/{node['name']}")
             _dict = models_tree
             for part in node['name'].split('_')[1:]:
                 _dict[part] = _dict.get(part, {}) 
                 _dict = _dict[part]
             _dict['item'] = {}
         else:
-            paths.append(f"Legacy/{schema}/{node['name']}")
+            paths.append(f"legacy/{schema}/{node['name']}")
 
     iterate = True
     while iterate:
@@ -101,11 +101,11 @@ def get_node_path(df):
 
     paths_with_subfolders = []
     for path in paths:
-        if path.startswith('Models/'):
+        if path.startswith('models/'):
             _, schema, name = path.split('/')
             prefix, suffix = name.split('_', 1)
             folder = next(f for f in models_folders if suffix.startswith(f))
-            path = f'Models/{schema}/{folder}/{prefix}_{suffix}'
+            path = f'models/{schema}/{folder}/{prefix}_{suffix}'
         paths_with_subfolders.append(path)
     return paths_with_subfolders
     
@@ -143,34 +143,8 @@ sources = get_dataframe('sources')
 nodes = get_dataframe('nodes')
 
 
-
-# raw_data_schemas = sorted(pd.concat([
-#     sources['schema'],
-#     nodes.loc[nodes['database'] == 'RAW']['schema'],
-# ]).unique())
-# raw_data = pd.DataFrame({
-#     'asset_type': ['raw_data'],
-#     'path': ['Raw Data/index'],
-#     'data': [{'schemas': raw_data_schemas}],
-# })
-
-source_models_schemas = sorted(nodes.loc[nodes['database'] == 'PREP']['schema'].unique())
-source_models = pd.DataFrame({
-    'asset_type': ['source_models'],
-    'path': ['Source Models/index'],
-    'data': [{'schemas': source_models_schemas}],
-})
-
-
 sources = format_df(sources, 'source')
 nodes = format_df(nodes, 'node')
-
-# snapshots = nodes.loc[nodes['resource_type'] == 'snapshot']
-# models = nodes.loc[nodes['resource_type'] == 'model']
-# prep_models = models.loc[nodes['database'] == 'PREP']
-# prod_models = models.loc[nodes['database'] != 'PROD']
-# raw_models = models.loc['']
-
 
 exposures = get_dataframe('exposures')
 exposures = format_df(exposures, 'exposure')
@@ -187,20 +161,17 @@ home = pd.DataFrame({
     'data': [{}],
 })
 
-
-# nodes = get_dataframe('nodes')
-# snapshots = nodes.loc[nodes['resource_type'] == 'snapshot']
-# seeds = nodes.loc[nodes['resource_type'] == 'seed']
-# prep_models = nodes.loc[(nodes['resource_type'] == 'model') & (nodes['database'] == 'PREP')]
-# prod_models = nodes.loc[(nodes['resource_type'] == 'model') & (nodes['database'] != 'PREP')]
-# breakpoint()
-
-# config
-# depends_on
-# tags
-assets = pd.concat([home, source_models, exposures, sources, nodes])
+assets = pd.concat([home, exposures, sources, nodes])
 assets.to_parquet(f'{HERE}/assets.parquet')
 
 
+
+# snapshots = nodes.loc[nodes['resource_type'] == 'snapshot']
+# seeds = nodes.loc[nodes['resource_type'] == 'seed']
+# config
+# depends_on
+# tags
 # sources['created_at'] = sources['created_at'].map(lambda ts: datetime.datetime.utcfromtimestamp(1347517370).strftime('%Y-%m-%d %H:%M:%S'))
 # sources['row_count'] = sources['stats'].map(lambda stats: stats.get('row_count', {}).get('value', 10))
+
+

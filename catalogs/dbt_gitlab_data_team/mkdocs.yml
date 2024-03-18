@@ -2,6 +2,19 @@ site_name: Gitlab Team dbt
 site_url: http://catalogs.unytics.io/dbt_gitlab_data_team/
 extra_css:
   - style.css
+nav:
+  - Welcome!: index.md
+  - Team Workspaces: 
+    - ... | team_workspaces/**
+  - Models: 
+    - ... | models/**
+  - Source Models:
+    - ... | source_models/**
+  - Raw Data:
+    - ... | raw_data/**
+  - Exposures: exposures/index.md
+  - Legacy:
+    - ... | legacy/**
 theme:
   name: material
   logo: https://cdn-icons-png.flaticon.com/256/5968/5968853.png
@@ -24,3 +37,6 @@ markdown_extensions:
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji
       emoji_generator: !!python/name:material.extensions.emoji.to_svg
+plugins:
+  - search
+  - awesome-pages

@@ -15,7 +15,7 @@ search:
   exclude: true
 ---
 
-# {{ name }}
+# {{ name | title }}
 
 <div class="grid cards" markdown>
 
@@ -96,6 +96,6 @@ class Catalog:
             files_and_folders = sorted(files + folders, key=lambda x: x['name'])
             content = FOLDER_TEMPLATE.render(
                 files_and_folders=files_and_folders,
-                name=root_name,
+                name=root_name.replace('_', ' '),
             )
             open(f'{root}/index.md', 'w', encoding='utf-8').write(content)

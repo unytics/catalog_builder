@@ -26,6 +26,7 @@ setuptools.setup(
     python_requires='>=3.6',
     install_requires=[
         'mkdocs-material',
+        'mkdocs-awesome-pages-plugin',
         'click',
         'click-help-colors',
         'pyarrow',
