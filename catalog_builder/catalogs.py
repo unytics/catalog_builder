@@ -10,6 +10,22 @@ from .utils import CatalogException
 CATALOGS_CONF_FOLDER = 'catalogs'
 
 
+FOLDER_TEMPLATE = jinja2.Template('''# {{ name }}
+
+<div class="grid cards" markdown>
+
+-   {% for obj in files_and_folders -%}
+    {% if obj.type == 'file' -%}
+    :material-file: [{{ obj.name | replace('.md', '') }}]({{ obj.name }})<br>
+    {% else -%}
+    :material-folder: [{{ obj.name }}]({{ obj.name }}/index.md)<br>
+    {% endif %}
+    {% endfor %}
+
+</div>
+''')
+
+
 
 class Catalog:
 
@@ -45,7 +61,13 @@ class Catalog:
 
     def generate_markdown(self):
         shutil.rmtree(f'{self.folder}/docs', ignore_errors=True)
-        for k, asset in enumerate(self.assets.to_dict(orient='records')):
+        self._generate_markdown_of_assets()
+        self._generate_markdown_of_folders()
+        if os.path.isfile(f'{self.folder}/style.css'):
+            shutil.copyfile(f'{self.folder}/style.css', f'{self.folder}/docs/style.css')
+
+    def _generate_markdown_of_assets(self):
+        for asset in self.assets.to_dict(orient='records'):
             if not asset['path'] or asset['asset_type'] not in self.templates:
                 continue
             template = self.templates[asset['asset_type']]
@@ -58,5 +80,17 @@ class Catalog:
             os.makedirs(folder, exist_ok=True)
             with open(path, 'w', encoding='utf8') as out:
                 out.write(content)
-        if os.path.isfile(f'{self.folder}/style.css'):
-            shutil.copyfile(f'{self.folder}/style.css', f'{self.folder}/docs/style.css')
+
+    def _generate_markdown_of_folders(self):
+        for root, folders, files in os.walk(f'{self.folder}/docs/'):
+            if 'index.md' in files:
+                continue
+            root_name = os.path.basename(root)
+            files = [{'name': f, 'type': 'file'} for f in files]
+            folders = [{'name': f, 'type': 'folder'} for f in folders]
+            files_and_folders = sorted(files + folders, key=lambda x: x['name'])
+            content = FOLDER_TEMPLATE.render(
+                files_and_folders=files_and_folders,
+                name=root_name,
+            )
+            open(f'{root}/index.md', 'w', encoding='utf-8').write(content)

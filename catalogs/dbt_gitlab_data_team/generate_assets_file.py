@@ -139,17 +139,6 @@ def format_df(df, asset_type):
     return df[['asset_type', 'path', 'data']]
 
 
-def get_schemas_from_nodes(nodes):
-    schemas = nodes.copy()
-    schemas['path'] = schemas['path'].map(lambda path: '/'.join(path.split('/')[:-1]) + '/index')
-    schemas['name'] = schemas['path'].map(lambda path: path.split('/')[1])
-    schemas['table'] = schemas['data'].map(lambda data: data['name'])
-    schemas = schemas.groupby('path').agg(
-        name=('name', 'max'),
-        tables=('table', list),
-    ).reset_index()
-    return schemas
-
 sources = get_dataframe('sources')
 nodes = get_dataframe('nodes')
 
@@ -175,8 +164,6 @@ source_models = pd.DataFrame({
 
 sources = format_df(sources, 'source')
 nodes = format_df(nodes, 'node')
-schemas = get_schemas_from_nodes(pd.concat([sources, nodes]))
-schemas = format_df(schemas, 'schema')
 
 # snapshots = nodes.loc[nodes['resource_type'] == 'snapshot']
 # models = nodes.loc[nodes['resource_type'] == 'model']
@@ -211,7 +198,7 @@ home = pd.DataFrame({
 # config
 # depends_on
 # tags
-assets = pd.concat([home, raw_data, source_models, schemas, exposures, sources, nodes])
+assets = pd.concat([home, raw_data, source_models, exposures, sources, nodes])
 assets.to_parquet(f'{HERE}/assets.parquet')
 
 
