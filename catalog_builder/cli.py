@@ -4,7 +4,7 @@ import click
 from click_help_colors import HelpColorsGroup
 
 from .catalogs import Catalog
-from .utils import handle_error, print_info, download_github_folder, exec, CatalogException, load_yaml_file
+from .utils import handle_error, print_info, print_success, download_github_folder, exec, CatalogException, load_yaml_file
 
 
 @click.group(
