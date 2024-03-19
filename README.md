@@ -52,10 +52,10 @@ pip install catalog-builder
 ### 3.2 Create your first documentation configuration 👨‍💻
 
 ``` sh
-catalog download bigquery_public_data
+catalog download dbt_gitlab_data_team
 ```
 
-To get started, let's download  a catalog configuration example from the GitHub repo and play with it. The above command will download the [`catalogs/bigquery_public_data`](https://github.com/unytics/catalog_builder/tree/main/catalogs/bigquery_public_data) folder on your laptop.
+To get started, let's download  a catalog configuration example from the GitHub repo and play with it. The above command will download the [`catalogs/dbt_gitlab_data_team`](https://github.com/unytics/catalog_builder/tree/main/catalogs/dbt_gitlab_data_team) folder on your laptop.
 
 
 > You will find in the folder:
@@ -74,18 +74,18 @@ To get started, let's download  a catalog configuration example from the GitHub 
 ### 3.3 Build your catalog website 👾
 
 ``` sh
-catalog build bigquery_public_data
+catalog build dbt_gitlab_data_team
 ```
 
-> 1. For each asset of the `assets file`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/bigquery_public_data/docs/` at `documentation_path`.
-> 2. All files in `catalogs/bigquery_public_data/source_docs/` are copied into `catalogs/bigquery_public_data/docs/`
-> 3. Mkdocs will then build the documentation website from the markdown files into `catalogs/bigquery_public_data/site` (using `mkdocs.yml` configuration file).
+> 1. For each asset of the `assets file`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/dbt_gitlab_data_team/docs/` at `documentation_path`.
+> 2. All files in `catalogs/dbt_gitlab_data_team/source_docs/` are copied into `catalogs/dbt_gitlab_data_team/docs/`
+> 3. Mkdocs will then build the documentation website from the markdown files into `catalogs/dbt_gitlab_data_team/site` (using `mkdocs.yml` configuration file).
 
 
 ### 3.4 Run your catalog website locally ⚡
 
 ``` sh
-catalog serve bigquery_public_data
+catalog serve dbt_gitlab_data_team
 ```
 
 > You can now see the generated documentation website at http://localhost:8000.
@@ -96,7 +96,7 @@ catalog serve bigquery_public_data
 **A. To deploy on GitHub pages**:
 
 ``` sh
-catalog deploy github-pages bigquery_public_data
+catalog deploy github-pages dbt_gitlab_data_team
 ```
 
 > Mkdocs will [deploy the site on GitHub pages](https://www.mkdocs.org/user-guide/deploying-your-docs/) (this only works if you are on a github repository).
@@ -105,10 +105,10 @@ catalog deploy github-pages bigquery_public_data
 **B. To deploy on Google Cloud Storage Bucket**:
 
 ``` sh
-catalog deploy gcs bigquery_public_data
+catalog deploy gcs dbt_gitlab_data_team
 ```
 
-> Mkdocs will copy all the files in `catalogs/bigquery_public_data/site` to the bucket defined by `site_url` value of `catalogs/bigquery_public_data/mkdocs.yml`. For instance if the site url is `http://catalogs.unytics.io/bigquery_public_data/` it will copy all files under `catalogs/bigquery_public_data/site` to `gs://catalogs.unytics.io/bigquery_public_data/` 
+> Mkdocs will copy all the files in `catalogs/dbt_gitlab_data_team/site` to the bucket defined by `site_url` value of `catalogs/dbt_gitlab_data_team/mkdocs.yml`. For instance if the site url is `http://catalogs.unytics.io/dbt_gitlab_data_team/` it will copy all files under `catalogs/dbt_gitlab_data_team/site` to `gs://catalogs.unytics.io/dbt_gitlab_data_team/` 
 
 
 **C. To deploy elsewhere**:
