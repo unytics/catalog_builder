@@ -1,7 +1,7 @@
 site_name: Gitlab Team dbt
 site_url: http://catalogs.unytics.io/dbt_gitlab_data_team/
 extra_css:
-  - style.css
+  - extra/style.css
 nav:
   - Welcome!: index.md
   - Models: 

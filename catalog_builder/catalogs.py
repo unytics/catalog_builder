@@ -17,6 +17,8 @@ search:
 
 {{ content }}
 
+{% if files_and_folders %}
+
 <div class="grid cards" markdown>
 
 -   {% for obj in files_and_folders -%}
@@ -28,6 +30,8 @@ search:
     {% endfor %}
 
 </div>
+
+{% endif %}
 ''')
 
 
@@ -37,6 +41,7 @@ class Catalog:
     def __init__(self, name):
         self.name = name
         self.folder = f'{CATALOGS_CONF_FOLDER}/{name}'
+        self.generated_docs_folder = f'{self.folder}/docs'
         self.load_templates()
         self._assets = None
 
@@ -67,11 +72,11 @@ class Catalog:
         return self._assets
 
     def generate_markdown(self):
-        shutil.rmtree(f'{self.folder}/docs', ignore_errors=True)
+        shutil.rmtree(self.generated_docs_folder, ignore_errors=True)
+        if os.path.isdir(f'{self.folder}/source_docs'):
+            shutil.copytree(f'{self.folder}/source_docs', self.generated_docs_folder)
         self._generate_markdown_of_assets()
         self._generate_markdown_of_folders()
-        if os.path.isfile(f'{self.folder}/style.css'):
-            shutil.copyfile(f'{self.folder}/style.css', f'{self.folder}/docs/style.css')
 
     def _generate_markdown_of_assets(self):
         for asset in self.assets.to_dict(orient='records'):
@@ -80,7 +85,7 @@ class Catalog:
             template = self.templates[asset['asset_type']]
             content = template.render(**asset['data'])
             path = asset['path'].replace('\\', '/')
-            path = f'{self.folder}/docs/{path}'
+            path = f'{self.generated_docs_folder}/{path}'
             if not path.endswith('.md'):
                 path += '.md'
             folder = '/'.join(path.split('/')[:-1])
@@ -89,23 +94,19 @@ class Catalog:
                 out.write(content)
 
     def _generate_markdown_of_folders(self):
-        for root, folders, files in os.walk(f'{self.folder}/docs/'):
+        for root, folders, files in os.walk(self.generated_docs_folder):
             if 'index.md' in files:
-                continue
-            root_name = os.path.basename(root)
-            if root_name:
-                filename = root.replace(f'{self.folder}/docs/', '') + '/index'
+                content = open(f'{root}/index.md', encoding='utf-8').read()
             else:
-                filename = 'index'
-            if filename in self.templates:
-                content = self.templates[filename].render()
+                content = '# ' + os.path.basename(root).replace('_', ' ').title()
+            if root == self.generated_docs_folder:
+                files_and_folders = None
             else:
-                content = '# ' + root_name.replace('_', ' ').title()
-            files = [{'name': f, 'type': 'file'} for f in files]
-            folders = [{'name': f, 'type': 'folder'} for f in folders]
-            files_and_folders = sorted(files + folders, key=lambda x: x['name'])
+                files = [{'name': f, 'type': 'file'} for f in files if f != 'index.md']
+                folders = [{'name': f, 'type': 'folder'} for f in folders]
+                files_and_folders = sorted(files + folders, key=lambda x: x['name'])
             content = FOLDER_TEMPLATE.render(
                 files_and_folders=files_and_folders,
-                content=content
+                content=content,
             )
             open(f'{root}/index.md', 'w', encoding='utf-8').write(content)

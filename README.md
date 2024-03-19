@@ -67,6 +67,7 @@ To get started, let's download  a catalog configuration example from the GitHub 
 > - `generate_assets_file.py`: the python script used to (re)generate the `assets file`.
 > - `requirements.txt`: the python requirements needed by `generate_assets_file.py`.
 > - `templates`: a folder which includes a jinja-template markdown-file for each `asset_type`. These templates are used to generate a markdown documentation file for each asset.
+> - `source_docs`: a folder which includes files to include as-is in the documentation.
 > - `mkdocs.yml`: the mkdocs configuration file used by mkdocs to build the documentation website from the generated markdown files.
 
 
@@ -77,7 +78,8 @@ catalog build bigquery_public_data
 ```
 
 > 1. For each asset of the `assets file`, the jinja template of `asset_type` will be rendered using the asset `data` to generate a markdown file which will be written into `catalogs/bigquery_public_data/docs/` at `documentation_path`.
-> 2. Mkdocs will then build the documentation website from the markdown files into `catalogs/bigquery_public_data/site` (using `mkdocs.yml` configuration file).
+> 2. All files in `catalogs/bigquery_public_data/source_docs/` are copied into `catalogs/bigquery_public_data/docs/`
+> 3. Mkdocs will then build the documentation website from the markdown files into `catalogs/bigquery_public_data/site` (using `mkdocs.yml` configuration file).
 
 
 ### 3.4 Run your catalog website locally ⚡
