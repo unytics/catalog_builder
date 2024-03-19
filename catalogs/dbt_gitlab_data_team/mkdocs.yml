@@ -10,7 +10,7 @@ nav:
     - ... | sources/**
   - Raw Data:
     - ... | raw_data/**
-  - Team Workspaces: 
+  - Team Data: 
     - ... | workspaces/**
   - Exposures: exposures/index.md
   - Legacy:

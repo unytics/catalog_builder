@@ -79,6 +79,7 @@ def get_node_path(df):
     
 
 def get_dataframe(key):
+    asset_type = key.rstrip('s')
     if key == 'exposures':
         df = pd.DataFrame(MANIFEST[key].values())
         df = df.sort_values(['type', 'name'])
@@ -96,10 +97,6 @@ def get_dataframe(key):
     # if 'depends_on' in df.columns:
     #     df['depends_on'] = df['depends_on'].map(lambda dep: dep['nodes'])
     df = df.fillna('')
-    return df
-
-
-def format_df(df, asset_type):
     conf = ASSET_TYPES[asset_type]
     df['asset_type'] = asset_type
     df['path'] = conf['path'](df)
@@ -109,27 +106,15 @@ def format_df(df, asset_type):
 
 sources = get_dataframe('sources')
 nodes = get_dataframe('nodes')
-
-
-sources = format_df(sources, 'source')
-nodes = format_df(nodes, 'node')
-
 exposures = get_dataframe('exposures')
-exposures = format_df(exposures, 'exposure')
+
 exposures = pd.DataFrame({
     'asset_type': ['exposures'],
     'path': ['exposures/index'],
     'data': [{'exposures': exposures['data'].to_list()}],
 })    
 
-
-home = pd.DataFrame({
-    'asset_type': ['homepage'],
-    'path': ['index'],
-    'data': [{}],
-})
-
-assets = pd.concat([home, exposures, sources, nodes])
+assets = pd.concat([sources, nodes, exposures])
 assets.to_parquet(f'{HERE}/assets.parquet')
 
 

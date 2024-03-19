@@ -1,3 +1,5 @@
+# Shared / Conformed Dimensions 
+
 Conformed Dimensions serve as the basis for a series of interlocking stars.
 
 1.  A conformed dimension is a dimension that has the same meaning to every fact with which it relates to. Different subject areas share conformed dimensions.

@@ -1,3 +1,5 @@
+# Local Dimensions
+
 Local dimensions serve as the basis for analyzing one star.
 
 1.  These dimensions have not been conformed across multiple subject areas and they cannot be shared by a series of interlocking stars in the same way that a conformed dimension could.

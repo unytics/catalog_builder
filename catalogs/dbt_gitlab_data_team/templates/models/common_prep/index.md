@@ -1,3 +1,5 @@
+# Common Prep: Layer of transformation on top of Source Models
+
 The Common Prep Schema has 6 primary use cases at this time. The use cases are as follows:
 
 1.  Generate Surrogate Keys used in the Common Schema.

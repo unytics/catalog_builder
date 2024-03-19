@@ -15,8 +15,6 @@ search:
   exclude: true
 ---
 
-# {{ name | title }}
-
 {{ content }}
 
 <div class="grid cards" markdown>
@@ -95,16 +93,19 @@ class Catalog:
             if 'index.md' in files:
                 continue
             root_name = os.path.basename(root)
-            filename = root.replace(f'{self.folder}/docs/', '') + '/index'
-            content = ''
+            if root_name:
+                filename = root.replace(f'{self.folder}/docs/', '') + '/index'
+            else:
+                filename = 'index'
             if filename in self.templates:
                 content = self.templates[filename].render()
+            else:
+                content = '# ' + root_name.replace('_', ' ').title()
             files = [{'name': f, 'type': 'file'} for f in files]
             folders = [{'name': f, 'type': 'folder'} for f in folders]
             files_and_folders = sorted(files + folders, key=lambda x: x['name'])
             content = FOLDER_TEMPLATE.render(
                 files_and_folders=files_and_folders,
-                name=root_name.replace('_', ' '),
                 content=content
             )
             open(f'{root}/index.md', 'w', encoding='utf-8').write(content)
