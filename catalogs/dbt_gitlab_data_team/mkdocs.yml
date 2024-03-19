@@ -17,6 +17,7 @@ nav:
     - ... | legacy/**
 theme:
   name: material
+  favicon: https://about.gitlab.com/nuxt-images/ico/favicon.ico
   logo: https://cdn-icons-png.flaticon.com/256/5968/5968853.png
   palette:
     primary: black  
