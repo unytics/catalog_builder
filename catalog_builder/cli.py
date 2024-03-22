@@ -40,14 +40,15 @@ def download(catalog_name):
 @cli.command()
 @click.argument("catalog_name")
 @click.option("--markdown_only", is_flag=True)
+@click.option("--add_children_in_folder_pages", is_flag=True)
 @handle_error
-def build(catalog_name, markdown_only):
+def build(catalog_name, markdown_only, add_children_in_folder_pages):
     """
     Build CATALOG_NAME catalog (builds docs/ and site/)
     """
     catalog = Catalog(catalog_name)
     print_info(f"Generating mardown files into {catalog.folder}/docs")
-    catalog.generate_markdown()
+    catalog.generate_markdown(add_children_in_folder_pages)
     if markdown_only:
         return
     config_file = f"catalogs/{catalog_name}/mkdocs.yml"
@@ -83,23 +84,30 @@ def serve(catalog_name, port):
 
 @cli.command()
 @click.argument("catalog_name")
+@click.option("--add_children_in_folder_pages", is_flag=True)
+@click.option(
+    "--port",
+    default=8000,
+    help="port on which the catalog will be exposed",
+    show_default=True,
+)
 @handle_error
-def build_and_serve(catalog_name):
+def build_and_serve(catalog_name, add_children_in_folder_pages, port):
     """
     Serve CATALOG_NAME website on http://localhost:8000
     """
     catalog = Catalog(catalog_name)
     print_info(f"Generating mardown files into {catalog.folder}/docs")
-    catalog.generate_markdown()
+    catalog.generate_markdown(add_children_in_folder_pages)
     config_file = f"catalogs/{catalog_name}/mkdocs.yml"
     if not os.path.isfile(config_file):
         raise CatalogException(f"Missing config file {config_file}")
     print_info(f"Building site from mardown files into {catalog.folder}/site")
     exec(f"mkdocs build --config-file {config_file}")
     print_info(
-        "Serving website. Open this url in your browser --> http://localhost:8000 !"
+        f"Serving website. Open this url in your browser --> http://localhost:{port} !"
     )
-    exec(f"python -m http.server --directory {catalog.folder}/site")
+    exec(f"python -m http.server {port} --directory {catalog.folder}/site")
 
 
 @cli.group()
