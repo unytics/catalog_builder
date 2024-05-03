@@ -40,15 +40,20 @@ def download(catalog_name):
 @cli.command()
 @click.argument("catalog_name")
 @click.option("--markdown_only", is_flag=True)
+@click.option("--markdown_folder_paths_to_include", default="catalogs/<catalog_name>/source_docs")
 @click.option("--add_children_in_folder_pages", is_flag=True)
 @handle_error
-def build(catalog_name, markdown_only, add_children_in_folder_pages):
+def build(catalog_name, markdown_only, markdown_folder_paths_to_include, add_children_in_folder_pages):
     """
     Build CATALOG_NAME catalog (builds docs/ and site/)
     """
     catalog = Catalog(catalog_name)
     print_info(f"Generating mardown files into {catalog.folder}/docs")
-    catalog.generate_markdown(add_children_in_folder_pages)
+    markdown_folder_paths_to_include = markdown_folder_paths_to_include.replace('<catalog_name>', catalog_name).split(',')
+    catalog.generate_markdown(
+        markdown_folder_paths_to_include=markdown_folder_paths_to_include,
+        add_children_in_folder_pages=add_children_in_folder_pages, 
+    )
     if markdown_only:
         return
     config_file = f"catalogs/{catalog_name}/mkdocs.yml"
@@ -84,6 +89,7 @@ def serve(catalog_name, port):
 
 @cli.command()
 @click.argument("catalog_name")
+@click.option("--markdown_folder_paths_to_include", default="catalogs/<catalog_name>/source_docs")
 @click.option("--add_children_in_folder_pages", is_flag=True)
 @click.option(
     "--port",
@@ -92,13 +98,17 @@ def serve(catalog_name, port):
     show_default=True,
 )
 @handle_error
-def build_and_serve(catalog_name, add_children_in_folder_pages, port):
+def build_and_serve(catalog_name, markdown_folder_paths_to_include, add_children_in_folder_pages, port):
     """
     Serve CATALOG_NAME website on http://localhost:8000
     """
     catalog = Catalog(catalog_name)
     print_info(f"Generating mardown files into {catalog.folder}/docs")
-    catalog.generate_markdown(add_children_in_folder_pages)
+    markdown_folder_paths_to_include = markdown_folder_paths_to_include.replace('<catalog_name>', catalog_name).split(',')
+    catalog.generate_markdown(
+        markdown_folder_paths_to_include=markdown_folder_paths_to_include,
+        add_children_in_folder_pages=add_children_in_folder_pages, 
+    )
     config_file = f"catalogs/{catalog_name}/mkdocs.yml"
     if not os.path.isfile(config_file):
         raise CatalogException(f"Missing config file {config_file}")

@@ -73,10 +73,13 @@ class Catalog:
             )
         return self._assets
 
-    def generate_markdown(self, add_children_in_folder_pages=False):
+    def generate_markdown(self, markdown_folder_paths_to_include=None, add_children_in_folder_pages=False):
         shutil.rmtree(self.generated_docs_folder, ignore_errors=True)
-        if os.path.isdir(f"{self.folder}/source_docs"):
-            shutil.copytree(f"{self.folder}/source_docs", self.generated_docs_folder)
+        if markdown_folder_paths_to_include:
+            assert isinstance(markdown_folder_paths_to_include, list), 'markdown_folder_paths_to_include must be a list'
+            for folder in markdown_folder_paths_to_include:
+                if os.path.isdir(folder):
+                    shutil.copytree(folder, self.generated_docs_folder)
         self._generate_markdown_of_assets()
         if add_children_in_folder_pages:
             self._generate_markdown_of_folders()
