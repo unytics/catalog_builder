@@ -79,7 +79,7 @@ class Catalog:
             assert isinstance(markdown_folder_paths_to_include, list), 'markdown_folder_paths_to_include must be a list'
             for folder in markdown_folder_paths_to_include:
                 if os.path.isdir(folder):
-                    shutil.copytree(folder, self.generated_docs_folder)
+                    shutil.copytree(folder, self.generated_docs_folder, dirs_exist_ok=True)
         self._generate_markdown_of_assets()
         if add_children_in_folder_pages:
             self._generate_markdown_of_folders()
