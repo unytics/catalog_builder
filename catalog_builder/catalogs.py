@@ -75,14 +75,26 @@ class Catalog:
 
     def generate_markdown(self, markdown_folder_paths_to_include=None, add_children_in_folder_pages=False):
         shutil.rmtree(self.generated_docs_folder, ignore_errors=True)
-        if markdown_folder_paths_to_include:
-            assert isinstance(markdown_folder_paths_to_include, list), 'markdown_folder_paths_to_include must be a list'
-            for folder in markdown_folder_paths_to_include:
-                if os.path.isdir(folder):
-                    shutil.copytree(folder, self.generated_docs_folder, dirs_exist_ok=True)
+        self._copy_files_from_markdown_folders(markdown_folder_paths_to_include)
         self._generate_markdown_of_assets()
         if add_children_in_folder_pages:
             self._generate_markdown_of_folders()
+
+    def _copy_files_from_markdown_folders(self, markdown_folder_paths_to_include):
+        if not markdown_folder_paths_to_include:
+            return
+        assert isinstance(markdown_folder_paths_to_include, list), 'markdown_folder_paths_to_include must be a list'
+
+        def files_to_ignore(path, names):
+            return [
+                name
+                for name in names
+                if '.' in name and not name.endswith(('.md', '.css', '.js', '.html', '.png', '.jpg', '.jpeg'))
+            ]
+
+        for folder in markdown_folder_paths_to_include:
+            if os.path.isdir(folder):
+                shutil.copytree(folder, self.generated_docs_folder, dirs_exist_ok=True, ignore=files_to_ignore)
 
     def _generate_markdown_of_assets(self):
         for asset in self.assets.to_dict(orient="records"):
