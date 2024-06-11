@@ -113,8 +113,9 @@ class Catalog:
 
     def _generate_markdown_of_folders(self):
         for root, folders, files in os.walk(self.generated_docs_folder):
-            if "index.md" in files:
-                content = open(f"{root}/index.md", encoding="utf-8").read()
+            index_file = next((file for file in files if file.lower() in ['index.md', 'readme.md']), None)
+            if index_file in files:
+                content = open(f"{root}/{index_file}", encoding="utf-8").read()
             else:
                 content = "# " + os.path.basename(root).replace("_", " ").title()
             if root == self.generated_docs_folder:
@@ -127,4 +128,5 @@ class Catalog:
                 files_and_folders=files_and_folders,
                 content=content,
             )
-            open(f"{root}/index.md", "w", encoding="utf-8").write(content)
+            index_file = index_file or 'index.md'
+            open(f"{root}/{index_file}", "w", encoding="utf-8").write(content)
