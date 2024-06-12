@@ -89,7 +89,7 @@ class Catalog:
             return [
                 name
                 for name in names
-                if '.' in name and not name.endswith(('.md', '.css', '.js', '.html', '.png', '.jpg', '.jpeg'))
+                if '.' in name and not name.endswith(('.md', '.css', '.js', '.html', '.png', '.jpg', '.jpeg', '.avif'))
             ]
 
         for folder in markdown_folder_paths_to_include:
@@ -115,9 +115,15 @@ class Catalog:
         for root, folders, files in os.walk(self.generated_docs_folder):
             index_file = next((file for file in files if file.lower() in ['index.md', 'readme.md']), None)
             if index_file in files:
-                content = open(f"{root}/{index_file}", encoding="utf-8").read()
+                content = open(f"{root}/{index_file}", encoding="utf-8").read().strip()
+                if not content.startswith('# '):
+                    content = (
+                        "# " + os.path.basename(root).replace("_", " ").lower().title() +
+                        '\n' * 2 +
+                        content
+                    )
             else:
-                content = "# " + os.path.basename(root).replace("_", " ").title()
+                content = "# " + os.path.basename(root).replace("_", " ").lower().title()
             if root == self.generated_docs_folder:
                 files_and_folders = None
             else:
