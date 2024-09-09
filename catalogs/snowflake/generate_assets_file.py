@@ -3,7 +3,7 @@ import os
 import pandas as pd
 import snowflake.connector
 
-DATABASE = "FINANCIAL__ECONOMIC_ESSENTIALS"
+DATABASE = "FINANCE__ECONOMICS"
 SNOWFLAKE_ROLE = "CATALOG_BUILDER_ROLE"
 VIRTUAL_WAREHOUSE = "CATALOG_BUILDER_WH"
 HERE = os.path.dirname(os.path.abspath(__file__))
