@@ -3,6 +3,9 @@ import os
 import pandas as pd
 import snowflake.connector
 
+# TODO : charger de la donnée dans le snowflake pour voir si on a qqc et si c'est un pb côté code ou côté warehouse
+# TODO : comprendre pourquoi les calculs ne se font pas bien
+# TODO : sauvegarder la mise en place du compte
 DATABASE = "FINANCE__ECONOMICS"
 SNOWFLAKE_ROLE = "CATALOG_BUILDER_ROLE"
 VIRTUAL_WAREHOUSE = "CATALOG_BUILDER_WH"
@@ -204,7 +207,7 @@ conn = snowflake.connector.connect(
 cur = conn.cursor()
 
 
-# TODO : refacto le code ci-dessous avec une fonction ?
+
 def get_pandas_df_from_query(query: str) -> pd.DataFrame:
     return cur.execute(query).fetch_pandas_all().to_dict(orient="index")
 
@@ -217,7 +220,6 @@ db_data, schemas_data, tables_data, columns_data = map(
 # TODO : refacto le code ci-dessous
 
 # TODO : FAIRE UNE VERSION PLUS SIMPLE PUIS FAIRE UNE VERSION JOLIE
-# TODO : faire en virant les df 1 par 1 pour trouver celui ou ceux qui posent pb
 
 schema_metadata = (
     cur.execute(SCHEMA_METADATA_QUERY).fetch_pandas_all().to_dict(orient="index")
@@ -237,12 +239,12 @@ for table in tables_data.values():
         "\n", CHAR_TO_REPLACE_NEW_LINE
     )
 
-    """table["COLUMNS"] = map(
+    table["COLUMNS"] = map(
         lambda colonne: colonne.get("COMMENT", "").replace(
             "\n", CHAR_TO_REPLACE_NEW_LINE
         ),
         table["COLUMNS"],
-    )"""
+    )
 
 for schema in schemas_data.values():
     schema["TABLES"] = [
@@ -253,14 +255,16 @@ for schema in schemas_data.values():
         for table in tables_data.values()
         if table.get("TABLE_SCHEMA") == schema.get("SCHEMA_NAME")
     ]
+
     schema["SCHEMA_COMMENT"] = str(schema.get("SCHEMA_COMMENT") or "").replace(
         "\n", CHAR_TO_REPLACE_NEW_LINE
     )
+
     schema["KPI"] = [
         {
-            "SIZE": schema.get("SIZE"),
-            "TABLE_COMMENTS_PERCENTAGE": schema.get("TABLE_COMMENTS_PERCENTAGE"),
-            "FAKE_SCHEMA_COST": schema.get("FAKE_SCHEMA_COST"),
+            "SIZE": schema_metadata.get("SIZE"),
+            "TABLE_COMMENTS_PERCENTAGE": schema_metadata.get("TABLE_COMMENTS_PERCENTAGE"),
+            "FAKE_SCHEMA_COST": schema_metadata.get("FAKE_SCHEMA_COST"),
         }
         for schema_metadata in schema_metadata.values()
         if schema_metadata.get("TABLE_SCHEMA") == schema.get("SCHEMA_NAME")
