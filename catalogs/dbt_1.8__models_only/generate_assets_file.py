@@ -3,7 +3,6 @@ import json
 import os
 import urllib.request
 
-import duckdb
 import pandas as pd
 
 HERE = os.path.dirname(os.path.abspath(__file__)).replace('\\', '/')
@@ -29,15 +28,6 @@ def merge_columns(manifest_columns, catalog_columns):
             for name, col in manifest_columns.items()
         ]
     return []
-
-
-def get_all_subfolders(folder):
-    subfolders = []
-    path = ''
-    for part in folder.split('/'):
-        path += ('/' if path else '') + part
-        subfolders.append(path)
-    return subfolders
 
 
 parser = argparse.ArgumentParser()
@@ -70,36 +60,13 @@ models = nodes.loc[nodes['resource_type'] == 'model']
 # remove models in root folder
 models = models.loc[models['folder'] != '']
 
-models_assets = pd.DataFrame({
+assets = pd.DataFrame({
     'path': models['path'],
     'asset_type': 'model',
     'data': models.to_dict(orient='records'),
 })
 
-
-folders_readme = ['README.md'] + list(set([
-    f'{subfolder}/README.md'
-    for folder in models['folder'].unique()
-    for subfolder in get_all_subfolders(folder)
-]))
-folders_assets = pd.DataFrame({
-    'path': folders_readme,
-    'asset_type': 'folder',
-    'data': [
-        {'name': path.replace('/README.md', '').split('/')[-1].replace('README.md', 'Hello!')}
-        for path in folders_readme
-    ]
-})
-
-assets = pd.concat([
-    models_assets,
-    folders_assets,
-])
-
-assets = pd.concat([
-    assets.loc[assets['path'] == 'README.md'],
-    assets.sort_values('path').iloc[:10],
-])
-
+# TO REMOVE AFTERWARD: WE KEPT THIS TO ACCELERATE TESTING
+assets = assets.sort_values('path').iloc[:100]
 
 assets.to_json(f'{HERE}/assets.jsonl', orient='records', lines=True)
