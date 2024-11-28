@@ -3,7 +3,7 @@ hide:
   - toc
 ---
 
-# {{ name | title }}
+# {{ name | replace('_', ' ') | title }}
 
 <div class="grid cards" markdown>
 

@@ -53,3 +53,13 @@ python catalogs/dbt_1.8__models_only/generate_assets_file.py "path/to/manifest.j
 ```
 
 ## Build the website
+
+```
+catalog build dbt_1.8__models_only --add_children_in_folder_pages
+```
+
+## Launch the website locally
+
+```
+catalog serve dbt_1.8__models_only
+```
