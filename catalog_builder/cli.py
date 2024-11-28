@@ -48,18 +48,18 @@ def build(catalog_name, markdown_only, markdown_folder_paths_to_include, add_chi
     Build CATALOG_NAME catalog (builds docs/ and site/)
     """
     catalog = Catalog(catalog_name)
-    print_info(f"Generating mardown files into {catalog.folder}/docs")
+    print_info(f"Generating markdown files into {catalog.folder}/docs")
     markdown_folder_paths_to_include = markdown_folder_paths_to_include.replace('<catalog_name>', catalog_name).split(',')
     catalog.generate_markdown(
         markdown_folder_paths_to_include=markdown_folder_paths_to_include,
-        add_children_in_folder_pages=add_children_in_folder_pages, 
+        add_children_in_folder_pages=add_children_in_folder_pages,
     )
     if markdown_only:
         return
     config_file = f"catalogs/{catalog_name}/mkdocs.yml"
     if not os.path.isfile(config_file):
         raise CatalogException(f"Missing config file {config_file}")
-    print_info(f"Building site from mardown files into {catalog.folder}/site")
+    print_info(f"Building site from markdown files into {catalog.folder}/site")
     exec(f"mkdocs build --config-file {config_file}")
 
 
@@ -103,16 +103,16 @@ def build_and_serve(catalog_name, markdown_folder_paths_to_include, add_children
     Serve CATALOG_NAME website on http://localhost:8000
     """
     catalog = Catalog(catalog_name)
-    print_info(f"Generating mardown files into {catalog.folder}/docs")
+    print_info(f"Generating markdown files into {catalog.folder}/docs")
     markdown_folder_paths_to_include = markdown_folder_paths_to_include.replace('<catalog_name>', catalog_name).split(',')
     catalog.generate_markdown(
         markdown_folder_paths_to_include=markdown_folder_paths_to_include,
-        add_children_in_folder_pages=add_children_in_folder_pages, 
+        add_children_in_folder_pages=add_children_in_folder_pages,
     )
     config_file = f"catalogs/{catalog_name}/mkdocs.yml"
     if not os.path.isfile(config_file):
         raise CatalogException(f"Missing config file {config_file}")
-    print_info(f"Building site from mardown files into {catalog.folder}/site")
+    print_info(f"Building site from markdown files into {catalog.folder}/site")
     exec(f"mkdocs build --config-file {config_file}")
     print_info(
         f"Serving website. Open this url in your browser --> http://localhost:{port} !"
