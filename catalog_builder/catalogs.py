@@ -136,7 +136,7 @@ class Catalog:
             if root == self.generated_docs_folder:
                 files_and_folders = None
             else:
-                files = [{"name": f, "type": "file"} for f in files if f != "index.md"]
+                files = [{"name": f, "type": "file"} for f in files if f.lower() not in ['index.md', 'readme.md']]
                 folders = [{"name": f, "type": "folder"} for f in folders]
                 files_and_folders = sorted(files + folders, key=lambda x: x["name"])
             content = FOLDER_TEMPLATE.render(
