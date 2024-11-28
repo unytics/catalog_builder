@@ -163,3 +163,6 @@ site/
 TODO.md
 *.backup
 tmp*
+manifest.json
+catalog.json
+assets.jsonl
