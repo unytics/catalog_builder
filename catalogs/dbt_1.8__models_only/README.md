@@ -5,14 +5,14 @@ This example will generate a static documentation website of dbt models.
 It is an improvement over the original dbt docs for business people as:
 
 - only models are shown in the documentation (and not sources, etc). That reduce visual noise.
-- `README.md` file located in models folders will be rendered on the website. It becomes super-easy to document categories of models.
+- `README.md` files located in models folder and subfolders will be rendered on the website. It becomes super-easy to document categories of models.
 
 The rest of the document presents how to build and serve the documentation.
 
 
 ## Generate dbt artefacts files
 
-This example will use dbt artifact files as input for creating `assets.parquet` file and then for generating the website.
+We will use dbt artifact files as input for creating `assets.jsonl` file and then for generating the website.
 
 Create these artefacts files by running from your dbt folder:
 
@@ -22,7 +22,7 @@ dbt docs generate
 
 This will generate two files: `manifest.json` and `catalog.json` in `target` folder.
 
-> If you haven't any dbt project but still want to try this example, you can download the files of Gitlab Data team that they make public. Here are the links:
+> If you haven't any dbt project but still want to try this example, you can download the public files of Gitlab Data team. Here are the links:
 >
 > - [manifest.json](https://dbt.gitlabdata.com/manifest.json)
 > - [catalog.json](https://dbt.gitlabdata.com/catalog.json)
