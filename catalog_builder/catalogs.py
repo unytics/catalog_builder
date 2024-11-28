@@ -102,6 +102,15 @@ class Catalog:
                 continue
             template = self.templates[asset["asset_type"]]
             content = template.render(**asset["data"])
+            # if asset['path'].endswith('README.md'):
+            #     children = self.assets.loc[
+            #         self.assets['path'].map(lambda path: path.startswith(asset['path'].rstrip('README.md'))) &
+            #         (self.assets['path'].map(lambda path: len(path.split('/'))) == len(asset['path'].split('/'))) &
+            #         (self.assets['path'] != asset['path'])
+            #     ].to_dict(orient='records')
+            # else:
+            #     children = []
+            # content = template.render(**asset["data"], children=children)
             path = asset["path"].replace("\\", "/")
             path = f"{self.generated_docs_folder}/{path}"
             if not path.endswith(".md"):
