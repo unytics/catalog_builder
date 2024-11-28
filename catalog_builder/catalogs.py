@@ -65,7 +65,7 @@ class Catalog:
             return self._assets
         if os.path.isfile(f"{self.folder}/assets.parquet"):
             self._assets = pd.read_parquet(f"{self.folder}/assets.parquet")
-        elif os.path.isfile(f"{self.folder} /assets.jsonl"):
+        elif os.path.isfile(f"{self.folder}/assets.jsonl"):
             self._assets = pd.read_json(f"{self.folder}/assets.jsonl", lines=True)
         else:
             raise CatalogException(
