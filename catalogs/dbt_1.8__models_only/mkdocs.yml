@@ -1,9 +1,13 @@
 site_name: Your dbt Models
-# site_url: http://catalogs.unytics.io/bigquery_public_data/
+site_url: http://catalogs.unytics.io/dbt/
 extra_css:
   - style.css
 theme:
   name: material
+  favicon: https://about.gitlab.com/nuxt-images/ico/favicon.ico
+  logo: https://cdn-icons-png.flaticon.com/256/5968/5968853.png
+  palette:
+    primary: black
   custom_dir: overrides
   features:
     - navigation.instant

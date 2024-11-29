@@ -67,6 +67,6 @@ assets = pd.DataFrame({
 })
 
 # TO REMOVE AFTERWARD: WE KEPT THIS TO ACCELERATE TESTING
-assets = assets.sort_values('path').iloc[:100]
+# assets = assets.sort_values('path').iloc[:100]
 
 assets.to_json(f'{HERE}/assets.jsonl', orient='records', lines=True)
