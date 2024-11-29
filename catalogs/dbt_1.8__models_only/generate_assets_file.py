@@ -33,6 +33,7 @@ def merge_columns(manifest_columns, catalog_columns):
 parser = argparse.ArgumentParser()
 parser.add_argument('manifest_file')
 parser.add_argument('catalog_file')
+parser.add_argument('--dev', action='store_true')
 args = parser.parse_args()
 
 manifest_file = args.manifest_file
@@ -66,7 +67,8 @@ assets = pd.DataFrame({
     'data': models.to_dict(orient='records'),
 })
 
-# TO REMOVE AFTERWARD: WE KEPT THIS TO ACCELERATE TESTING
-# assets = assets.sort_values('path').iloc[:100]
+# If dev flaf is on, we export a limited set of assets to accelerate site build
+if args.dev:
+    assets = assets.sort_values('path').iloc[:100]
 
 assets.to_json(f'{HERE}/assets.jsonl', orient='records', lines=True)
