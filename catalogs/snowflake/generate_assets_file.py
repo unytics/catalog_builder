@@ -1,200 +1,26 @@
+import configparser
 import os
 
 import pandas as pd
 import snowflake.connector
 
-# TODO : charger de la donnée dans le snowflake pour voir si on a qqc et si c'est un pb côté code ou côté warehouse
-# TODO : comprendre pourquoi les calculs ne se font pas bien
 # TODO : sauvegarder la mise en place du compte
-DATABASE = "FINANCE__ECONOMICS"
-SNOWFLAKE_ROLE = "CATALOG_BUILDER_ROLE"
-VIRTUAL_WAREHOUSE = "CATALOG_BUILDER_WH"
+# CONNECTING TO DATABASE
+# TODO : virer ça dans la classe de chargement de la donnée ? eventuellement, le mettre en tant que connecteur et faire une inversion de dépendance ?
+# TODO : virer la partie database etc dans un fichier de conf du script --> un fichier .env pour pouvoir y mettre les mdp etc ?
+# TODO : comprendre pourquoi est-ce que ce code n'est pas lancé quand on lance le build and serve et ce qui est lancé à sa place
+# TODO : faire en sorte que le taf soit fait sur plusieurs databases et non une seule
+# TODO : faire en sorte que les créations d'assets soient faites dans des classes spécifiques avec des fonction utilitaires et virer ce code dégueulasse d'ici 
+
 HERE = os.path.dirname(os.path.abspath(__file__))
-CHAR_TO_REPLACE_NEW_LINE = " "
 
-DATABASES_QUERY = """
-SELECT 
-    DATABASE_NAME, 
-    DATABASE_OWNER, 
-    IS_TRANSIENT,
-    COMMENT AS DATABASE_COMMENT, 
-    CREATED AS DATABASE_CREATION, 
-    RETENTION_TIME, 
-    TYPE AS DATABASE_TYPE
-FROM INFORMATION_SCHEMA.DATABASES;
-"""
+config = configparser.ConfigParser()
+config.read(f'{HERE}/catalog_conf.ini')
+DATABASE = config['database']['name']
+SNOWFLAKE_ROLE = config['database']['role']
+VIRTUAL_WAREHOUSE = config['database']['warehouse_name']
 
-SCHEMAS_QUERY = """
-SELECT 
-    CATALOG_NAME AS DATABASE_NAME,
-    SCHEMA_NAME,
-    SCHEMA_OWNER,
-    IS_TRANSIENT,
-    IS_MANAGED_ACCESS,
-    RETENTION_TIME,
-    CREATED AS SCHEMA_CREATION,
-    COMMENT AS SCHEMA_COMMENT
-FROM INFORMATION_SCHEMA.SCHEMATA;
-"""
-
-TABLES_QUERY = """
-SELECT 
-    TABLE_CATALOG AS DATABASE_NAME,
-    TABLE_SCHEMA,
-    TABLE_NAME,
-    TABLE_OWNER,
-    TABLE_TYPE,
-    IS_TRANSIENT,
-    CLUSTERING_KEY,
-    ROW_COUNT,
-    BYTES,
-    RETENTION_TIME,
-    CREATED AS TABLE_CREATION,
-    LAST_ALTERED AS LAST_MODIFICATION,
-    LAST_DDL AS LAST_STRUCTURE_CHANGE,
-    LAST_DDL_BY AS LAST_STRUCTURE_CHANGER,
-    COMMENT AS TABLE_COMMENT,
-    IS_TEMPORARY
-FROM INFORMATION_SCHEMA.TABLES;
-"""
-
-COLUMNS_QUERY = """
-SELECT
-    TABLE_CATALOG AS TABLE_DATABASE,
-    TABLE_SCHEMA,
-    TABLE_NAME,
-    COLUMN_NAME,
-    IS_NULLABLE,
-    IS_IDENTITY,
-    DATA_TYPE,
-    CHARACTER_MAXIMUM_LENGTH,
-    CHARACTER_OCTET_LENGTH,
-    NUMERIC_PRECISION,
-    NUMERIC_PRECISION_RADIX,
-    NUMERIC_SCALE,
-    DATETIME_PRECISION,
-    INTERVAL_TYPE,
-    COMMENT
-FROM INFORMATION_SCHEMA.COLUMNS 
-ORDER BY 
-    TABLE_CATALOG,
-    TABLE_SCHEMA,
-    TABLE_NAME,
-    COLUMN_NAME,
-    ORDINAL_POSITION;
-"""
-
-# TODO : faire une requête qui sort le coût des requêtes d'un schéma par jour
-SCHEMA_METADATA_QUERY = """
-SELECT 
-    TABLE_SCHEMA
-    , SUM(BYTES) AS SIZE
-    , COUNT(COMMENT)/COUNT(*) * 100 AS TABLE_COMMENTS_PERCENTAGE
-    , 0 AS FAKE_SCHEMA_COST
-FROM INFORMATION_SCHEMA.TABLES GROUP BY TABLE_SCHEMA;
-"""
-
-TABLE_METADATA_QUERY = """
-SELECT
-    TABLE_SCHEMA
-    , COUNT(COMMENT)/COUNT(*) * 100 AS COLUMNS_COMMENTS_PERCENTAGE
-FROM INFORMATION_SCHEMA.COLUMNS GROUP BY TABLE_SCHEMA;
-"""
-
-# SCHEMA_COST = """ QUERY NEEDS A PROJECT THAT REALLY """ Example query to get the cost of a schema/table
-"""
-WITH table_names (table_name) AS(
-    SELECT TABLE_NAME from information_schema.tables WHERE table_schema='TESTS_FINOPS'
-),
-used_tables (
-    QUERY_ID,
-    accessed_object,
-    QUERY_START_TIME,
-    direct_objects_accessed_name,
-    objects_modified_name,
-    base_objects_accessed_name
-) AS (
-    select 
-        QUERY_ID,
-        DIRECT_OBJECTS_ACCESSED[0]."objectName" as accessed_object,
-        QUERY_START_TIME,
-        direct_objects_accessed_flattened.VALUE:objectName as direct_objects_accessed_name,
-        objects_modified_flattened.VALUE:objectName as objects_modified_name,
-        base_objects_accessed_flattened.VALUE:objectName as base_objects_accessed_name
-    from snowflake.account_usage.access_history,
-        LATERAL FLATTEN(input => snowflake.account_usage.access_history.DIRECT_OBJECTS_ACCESSED, outer=> true) direct_objects_accessed_flattened,
-        LATERAL FLATTEN(input => snowflake.account_usage.access_history.OBJECTS_MODIFIED, outer=> true) objects_modified_flattened,
-        LATERAL FLATTEN(input => snowflake.account_usage.access_history.BASE_OBJECTS_ACCESSED, outer=> true) base_objects_accessed_flattened
-        WHERE NOT IS_NULL_VALUE(direct_objects_accessed_flattened.VALUE:objectName) 
-            OR NOT IS_NULL_VALUE(objects_modified_flattened.VALUE:objectName) AND objects_modified_flattened.VALUE:objectName!='WORKSHEETS_APP.PUBLIC.BLOBS'
-            OR NOT IS_NULL_VALUE(base_objects_accessed_flattened.VALUE:objectName)
-),
-query_price (
-    QUERY_ID,
-    QUERY_TEXT,
-    CREDITS_USED_CLOUD_SERVICES,
-    QUERY_TYPE,
-    SESSION_ID,
-    USER_NAME,
-    ROLE_NAME,
-    WAREHOUSE_ID,
-    WAREHOUSE_NAME,
-    START_TIME,
-    END_TIME,
-    COMPILATION_TIME,
-    EXECUTION_TIME
-) AS (
-    SELECT
-        QUERY_ID,
-        QUERY_TEXT,
-        CREDITS_USED_CLOUD_SERVICES,
-        QUERY_TYPE,
-        SESSION_ID,
-        USER_NAME,
-        ROLE_NAME,
-        WAREHOUSE_ID,
-        WAREHOUSE_NAME,
-        START_TIME,
-        END_TIME,
-        COMPILATION_TIME,
-        EXECUTION_TIME
-    FROM snowflake.account_usage.query_history
-    WHERE true
-      --AND start_time >= TIMESTAMPADD(day, -1, CURRENT_TIMESTAMP)
-      AND SCHEMA_NAME='TESTS_FINOPS'
-      AND QUERY_TYPE!='SHOW' 
-)
-SELECT 
-    table_names.TABLE_NAME,
-    used_tables.QUERY_ID,
-    accessed_object,
-    QUERY_START_TIME,
-    direct_objects_accessed_name,
-    objects_modified_name,
-    base_objects_accessed_name,
-    QUERY_TEXT,
-    CREDITS_USED_CLOUD_SERVICES,
-    QUERY_TYPE,
-    SESSION_ID,
-    USER_NAME,
-    ROLE_NAME,
-    WAREHOUSE_ID,
-    WAREHOUSE_NAME,
-    START_TIME,
-    END_TIME,
-    COMPILATION_TIME,
-    EXECUTION_TIME
-FROM table_names
-INNER JOIN used_tables ON
-    CONTAINS(used_tables.direct_objects_accessed_name, table_names.TABLE_NAME)
-    OR CONTAINS(used_tables.objects_modified_name, table_names.TABLE_NAME)
-    OR CONTAINS(used_tables.base_objects_accessed_name, table_names.TABLE_NAME)    
-INNER JOIN query_price ON used_tables.QUERY_ID=query_price.QUERY_ID;
-
-
-SELECT COMMENT FROM COLUMNS WHERE COMMENT IS NULL or COMMENT='';
-"""
-
+CHAR_TO_REPLACE_NEW_LINE = config['metadata']['char_to_replace_new_line']
 
 conn = snowflake.connector.connect(
     user=os.getenv("SNOWFLAKE_USER"),
@@ -206,27 +32,59 @@ conn = snowflake.connector.connect(
 )
 cur = conn.cursor()
 
+# Running queries
 
+# TODO : transform this as objects with get query as the __init__ and the get_pandas_df_from_query as a method
+def get_query(query_name:str) -> str:
+    with open(f"{HERE}/sql_queries/{query_name}.sql") as f:
+        return f.read()
 
 def get_pandas_df_from_query(query: str) -> pd.DataFrame:
     return cur.execute(query).fetch_pandas_all().to_dict(orient="index")
 
-
-db_data, schemas_data, tables_data, columns_data = map(
+# TODO : faire ça avec une comprehension list ?
+queries_to_get = ["databases_query", "schemas_query", "tables_query", "columns_query", "schema_metadata_query", "table_metadata_query"]
+queries_list = [get_query(query_file) for query_file in queries_to_get]
+db_data, schemas_data, tables_data, columns_data, schema_metadata, table_metadata = map(
     lambda query: get_pandas_df_from_query(query),
-    [DATABASES_QUERY, SCHEMAS_QUERY, TABLES_QUERY, COLUMNS_QUERY],
+    queries_list,
 )
+"""DATABASES_QUERY = get_query("databases_query")
+
+SCHEMAS_QUERY = get_query("schemas_query")
+
+TABLES_QUERY = get_query("tables_query")
+
+COLUMNS_QUERY = get_query("columns_query")
+
+SCHEMA_METADATA_QUERY = get_query("schema_metadata_query")
+
+TABLE_METADATA_QUERY = get_query("table_metadata_query")
+
+queres_list = [
+    DATABASES_QUERY,
+    SCHEMAS_QUERY,
+    TABLES_QUERY,
+    COLUMNS_QUERY,
+    SCHEMA_METADATA_QUERY,
+    TABLE_METADATA_QUERY,
+]
+
+db_data, schemas_data, tables_data, columns_data, schema_metadata, table_metadata = map(
+    lambda query: get_pandas_df_from_query(query),
+    queres_list,
+)
+"""
 
 # TODO : refacto le code ci-dessous
 
 # TODO : FAIRE UNE VERSION PLUS SIMPLE PUIS FAIRE UNE VERSION JOLIE
 
-schema_metadata = (
-    cur.execute(SCHEMA_METADATA_QUERY).fetch_pandas_all().to_dict(orient="index")
-)
-table_metadata = (
-    cur.execute(TABLE_METADATA_QUERY).fetch_pandas_all().to_dict(orient="index")
-)
+#TODO : virer ça dans le map du dessus et faire une liste avec les 6 requêtes directement ?
+
+# transformaing data to fit the catalog's format
+def fix_comment(comment: str) -> str:
+    return comment.replace("\n", CHAR_TO_REPLACE_NEW_LINE)
 
 
 for table in tables_data.values():
@@ -235,9 +93,7 @@ for table in tables_data.values():
         for column in columns_data.values()
         if column.get("TABLE_NAME") == table.get("TABLE_NAME")
     ]
-    table["TABLE_COMMENT"] = table.get("TABLE_COMMENT").replace(
-        "\n", CHAR_TO_REPLACE_NEW_LINE
-    )
+    table["TABLE_COMMENT"] = fix_comment(table.get("TABLE_COMMENT"))
 
     table["COLUMNS"] = map(
         lambda colonne: colonne.get("COMMENT", "").replace(
@@ -255,10 +111,8 @@ for schema in schemas_data.values():
         for table in tables_data.values()
         if table.get("TABLE_SCHEMA") == schema.get("SCHEMA_NAME")
     ]
-
-    schema["SCHEMA_COMMENT"] = str(schema.get("SCHEMA_COMMENT") or "").replace(
-        "\n", CHAR_TO_REPLACE_NEW_LINE
-    )
+    # TODO : check ce que ça fait et ce qu'il se passe si on change ce get
+    schema["SCHEMA_COMMENT"] = fix_comment(str(schema.get("SCHEMA_COMMENT") or ""))
 
     schema["KPI"] = [
         {
@@ -270,8 +124,6 @@ for schema in schemas_data.values():
         if schema_metadata.get("TABLE_SCHEMA") == schema.get("SCHEMA_NAME")
     ][0]
 
-print(schema)
-
 for database in db_data.values():
     database["SCHEMAS"] = [
         {
@@ -281,9 +133,7 @@ for database in db_data.values():
         for schema in schemas_data.values()
         if schema.get("DATABASE_NAME") == database.get("DATABASE_NAME")
     ]
-    database["DATABASE_COMMENT"] = str(database.get("DATABASE_COMMENT") or "").replace(
-        "\n", CHAR_TO_REPLACE_NEW_LINE
-    )
+    database["DATABASE_COMMENT"] = fix_comment(str(database.get("DATABASE_COMMENT") or ""))
 
 databases = [
     {
@@ -319,6 +169,9 @@ columns = [
 ]
 
 # TODO : faire ça avec un map ?
+# TODO : comprendre ce que fait le str là-dedans
+# TODO : fix le table creation ?
+# TODO : comprendre les 3 premières lignes car elles sont un peu bizarres
 
 for table in tables:
     table["data"]["LAST_MODIFICATION"] = str(table["data"].get("LAST_MODIFICATION"))
@@ -327,7 +180,6 @@ for table in tables:
         table["data"].get("LAST_STRUCTURE_CHANGE")
     )
     table["data"]["COLUMNS"] = list(table["data"].get("COLUMNS"))
-    # print(json.dumps(table, indent=4))
 
 df = pd.concat(
     [

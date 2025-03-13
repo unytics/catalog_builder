@@ -1,4 +1,5 @@
 import os
+import shutil
 
 import click
 from click_help_colors import HelpColorsGroup
@@ -154,3 +155,37 @@ def gcs(catalog_name):
     destination = destination + ("/" if not destination.endswith("/") else "")
     print_info(f"Copying site to destination `{destination}`")
     exec(f"gcloud storage cp -r {catalog.folder}/site/* gs://{destination}")
+
+
+@cli.command()
+@click.argument("catalog_name")
+@click.option("--dry_run", is_flag=True)
+@handle_error
+def clean(catalog_name, dry_run):
+    """
+    Cleans generated files from catalog_name
+    """
+    catalog = Catalog(catalog_name)
+    if not os.path.isdir(f"{catalog.folder}/site") and not os.path.isdir(f"{catalog.folder}/docs"):
+        raise CatalogException(
+            f"`{catalog.folder}/site` and `{catalog.folder}/docs` folders do not exist. It will not be cleaned, you might have chosen the wrong catalog name."
+        )
+    to_remove = {
+        "files" : [f"{catalog.folder}/assets.parquet",f"{catalog.folder}/assets.jsonl",],
+        "folders" : [f"{catalog.folder}/docs", f"{catalog.folder}/site"]
+    }
+    files_to_remove = [file for file in to_remove["files"] if os.path.isfile(file)]
+    folders_to_remove = [folder for folder in to_remove["folders"] if os.path.isdir(folder)]
+    if dry_run:
+        print_info(f"Would remove the following files: {files_to_remove}")
+        print_info(f"Would remove the following folders: {folders_to_remove}")
+    else:
+        print_info(f"Removing the following files: {files_to_remove}")
+        for file in files_to_remove:
+            if os.path.isfile(file):
+                os.remove(file)
+        print_info(f"Removing the following folders: {folders_to_remove}")
+        for folder in folders_to_remove:
+            if os.path.isdir(folder):
+                shutil.rmtree(folder)
+        print_success("Cleaned")
