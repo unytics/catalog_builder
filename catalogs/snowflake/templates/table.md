@@ -2,24 +2,20 @@
 
 <div class="grid cards" markdown>
 
--   - **Full name**: `{{ DATABASE_NAME }}.{{ TABLE_SCHEMA }}.{{ TABLE_NAME }}`
-    - **Owner**: `{{ TABLE_OWNER }}`
-    - **Type**: `{{ TABLE_TYPE }}`
-    - **Is transient**: `{{ IS_TRANSIENT }}`
-    - **Clustering key**: `{{ CLUSTERING_KEY }}`
-    - **Number of rows**: `{{ ROW_COUNT }}`
-    - **Volume**: `{{ BYTES }}`
-    - **Retention time**: `{{ RETENTION_TIME }}`
-    - **Table creation**: `{{ TABLE_CREATION }}`
-    - **Last modification**: `{{ LAST_MODIFICATION }}`
-    - **Last table structure change**: `{{ LAST_STRUCTURE_CHANGE }}`
-    - **Last table structure changer**: `{{ LAST_STRUCTURE_CHANGER }}`
-    - **Table description**: `{{ TABLE_COMMENT }}`
-    - **Is table temporary**: `{{ IS_TEMPORARY }}`
-
--   **Description**
-
-    {{ (description or '<span style="color: var(--md-default-fg-color--lighter);">No description</span>') | indent(4, false, true) }}
+- **Full name**: `{{ DATABASE_NAME }}.{{ TABLE_SCHEMA }}.{{ TABLE_NAME }}`
+- **Owner**: `{{ TABLE_OWNER }}`
+- **Type**: `{{ TABLE_TYPE }}`
+- **Is transient**: `{{ IS_TRANSIENT }}`
+- **Clustering key**: `{{ CLUSTERING_KEY }}`
+- **Number of rows**: `{{ ROW_COUNT }}`
+- **Volume**: `{{ BYTES }}`
+- **Retention time**: `{{ RETENTION_TIME }}`
+- **Table creation**: `{{ TABLE_CREATION }}`
+- **Last modification**: `{{ LAST_MODIFICATION }}`
+- **Last table structure change**: `{{ LAST_STRUCTURE_CHANGE }}`
+- **Last table structure changer**: `{{ LAST_STRUCTURE_CHANGER }}`
+- **Table description**: `{{ TABLE_COMMENT }}`
+- **Is table temporary**: `{{ IS_TEMPORARY }}`
 
 </div>
 

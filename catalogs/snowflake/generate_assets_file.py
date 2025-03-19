@@ -34,12 +34,11 @@ def add_columns_to_table(table: Dict, columns_data: Dict) -> None:
 
 def fix_columns_comments(table: Dict) -> None:
     # fixing comments
-    table["COLUMNS"] = map(
-        lambda column: column.get("COMMENT", "").replace(
+    for column in table["COLUMNS"]:
+        column["COMMENT"] = column["COMMENT"].replace(
             "\n", CHAR_TO_REPLACE_NEW_LINE
-        ),
-        table["COLUMNS"],
-    )
+        )
+
 
 def add_tables_to_schema(schema: Dict, tables_data: Dict) -> None:
     schema["TABLES"] = [
