@@ -1,0 +1,19 @@
+site_name: Snowflake Example Catalog
+site_url: http://catalogs.unytics.io/snowflake_example_catalog/
+extra_css:
+  - style.css
+theme:
+  name: material
+  features:
+    - navigation.instant
+    # - navigation.tabs
+    - navigation.prune
+    - navigation.indexes     
+markdown_extensions:
+  - attr_list
+  - md_in_html  
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
