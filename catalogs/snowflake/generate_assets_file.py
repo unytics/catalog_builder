@@ -6,12 +6,6 @@ import pandas as pd
 import snowflake.connector
 from query import Query
 
-# CONNECTING TO DATABASE
-# TODO : virer ça dans la classe de chargement de la donnée ? eventuellement, le mettre en tant que connecteur et faire une inversion de dépendance ?
-# TODO : comprendre pourquoi est-ce que ce code n'est pas lancé quand on lance le build and serve et ce qui est lancé à sa place
-# TODO : vérifier que le taf soit fait sur plusieurs databases et non une seule
-# TODO : faire en sorte que les créations d'assets soient faites dans des classes spécifiques avec des fonction utilitaires et virer ce code dégueulasse d'ici 
-
 HERE = os.path.dirname(os.path.abspath(__file__))
 
 config = configparser.ConfigParser()
@@ -84,9 +78,6 @@ def get_column_path(column: Dict) -> str:
     return f"{column.get('DATABASE_NAME')}/{column.get('TABLE_SCHEMA')}/{column.get('TABLE_NAME')}/{column.get('COLUMN_NAME')}/index"
 
 
-
-
-
 if __name__ == "__main__":
     conn = snowflake.connector.connect(
         user=os.getenv("SNOWFLAKE_USER"),
@@ -98,22 +89,12 @@ if __name__ == "__main__":
     )
     cur = conn.cursor()
 
-    # Running queries
-
     queries_to_get = ["databases_query", "schemas_query", "tables_query", "columns_query", "schema_metadata_query", "table_metadata_query"]
     queries_list = [Query(query_file, cur) for query_file in queries_to_get]
     db_data, schemas_data, tables_data, columns_data, schema_metadata, table_metadata = map(
         lambda query: query.get_pandas_df_from_query(),
         queries_list,
     )
-    # TODO : faire une classe abstraite DatabaseObject qui ait 
-    # une méthode de fix_comments
-    # une méthode belongs to non-implémentée
-    # faire une classe par retour de requête pour avoir une façon plus claire d'interagir avec la donnée ?
-    # faire en sorte que cette classe soit ce qui est retourné par la classe Query ?
-    # faire en sorte que cette classe renvoie les df json directement avec une fonction pour créer leur path et rendre ça plus lisible
-
-
 
     for table in tables_data.values():
         add_columns_to_table(table, columns_data)
