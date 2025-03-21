@@ -25,8 +25,8 @@
 
 === "Columns"
 
-    | Column | Type | Description |
-    |---|---|---|
+    | Column | Type | Description | Is Primary Key |
+    |---|---|---|---|
     {% for column in COLUMNS -%}
     | `{{ column.COLUMN_NAME }}` | `{{ column.DATA_TYPE }}` | `{{ column.COMMENT }}` | `{{ column.IS_NULLABLE }}` | `{{ column.IS_IDENTITY }}` |
     {% endfor %}
